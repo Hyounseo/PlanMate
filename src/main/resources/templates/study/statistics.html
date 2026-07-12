@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>공부시간 통계 - PlanMate</title>
+    <!-- 공통 레이아웃(Header/Sidebar/Footer)은 팀원4가 만들면 그 안에 이 내용만 옮겨 넣으면 됨 -->
+    <link rel="stylesheet" th:href="@{/css/statistics.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="stats-container">
+    <h2>공부시간 통계</h2>
+
+    <!-- 요약 카드: 일별 / 주별 / 월별 -->
+    <div class="summary-cards">
+        <div class="card">
+            <p class="card-label">오늘</p>
+            <p class="card-value" id="dailyTotal">--</p>
+        </div>
+        <div class="card">
+            <p class="card-label">이번 주</p>
+            <p class="card-value" id="weeklyTotal">--</p>
+        </div>
+        <div class="card">
+            <p class="card-label">이번 달</p>
+            <p class="card-value" id="monthlyTotal">--</p>
+        </div>
+    </div>
+
+    <!-- 과목별 통계 그래프 -->
+    <div class="chart-box">
+        <h3>이번 달 과목별 공부시간</h3>
+        <canvas id="subjectChart" height="120"></canvas>
+    </div>
+</div>
+
+<script th:src="@{/js/statistics.js}"></script>
+</body>
+</html>
