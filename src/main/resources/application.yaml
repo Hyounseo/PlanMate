@@ -1,3 +1,17 @@
 spring:
-  application:
-    name: demo
+  datasource:
+    # 나중에 실제 MySQL 서버 주소가 나오면 localhost 부분을 바꿔주면 됩니다.
+    url: jdbc:mysql://localhost:3306/planmate?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # MySQL 접속 아이디 (보통 root)
+    username: root
+    # MySQL 접속 비밀번호 (각자 컴퓨터에 설치한 비밀번호. 보통 1234나 root)
+    password: 1234
+  jpa:
+    hibernate:
+      # 팀원들이 이 코드를 실행하면, 우리가 짠 User.java를 보고 자동으로 MySQL에 표를 만들어줍니다!
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
