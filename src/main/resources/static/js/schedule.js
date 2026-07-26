@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1. HTML 요소 가져오기
     // ==============================
 
-    // 과목 관리 영역
+    // 과목 관리
     const subjectList = document.getElementById("subjectList");
     const subjectNameInput = document.getElementById("subjectName");
     const subjectColorInput = document.getElementById("subjectColor");
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const updateSubjectBtn = document.getElementById("updateSubjectBtn");
     const deleteSubjectBtn = document.getElementById("deleteSubjectBtn");
 
-    // 일정 입력 영역
+    // 일정 입력
     const titleInput = document.getElementById("title");
     const dateInput = document.getElementById("date");
     const startTimeInput = document.getElementById("startTime");
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const memoInput = document.getElementById("memo");
     const statusSelect = document.getElementById("status");
 
-    // 일정 폼 아래의 등록·수정·삭제 버튼
+    // 일정 등록·수정·삭제 버튼
     const scheduleButtons = document.querySelectorAll(
         ".schedule-form-panel .button-row button"
     );
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const updateScheduleBtn = scheduleButtons[1];
     const deleteScheduleBtn = scheduleButtons[2];
 
-    // 캘린더 영역
+    // 캘린더
     const calendarTitle = document.querySelector(".calendar-header h3");
     const calendarButtons = document.querySelectorAll(
         ".calendar-header button"
@@ -40,77 +40,161 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextMonthBtn = calendarButtons[1];
     const calendarDates = document.querySelector(".dates");
 
-    // 위쪽 + 일정 등록 버튼
     const openScheduleFormBtn = document.querySelector(
         ".page-title .primary-button"
     );
 
-
     // ==============================
-    // 2. 브라우저 저장소에서 데이터 불러오기
+    // 2. 화면에서 사용할 데이터
     // ==============================
 
-    let subjects =
-        JSON.parse(localStorage.getItem("planmateSubjects")) || [
-            {
-                name: "영어",
-                color: "#6b7280"
-            },
-            {
-                name: "자바",
-                color: "#2563eb"
-            },
-            {
-                name: "자료구조",
-                color: "#16a34a"
-            }
-        ];
+    let subjects = [];
+    let schedules = [];
 
-    let schedules =
-        JSON.parse(localStorage.getItem("planmateSchedules")) || [];
+    // 수정·삭제 대상으로 선택한 과목 ID
+    let selectedSubjectId = null;
 
-    // 현재 선택한 과목 번호
-    let selectedSubjectIndex = -1;
-
-    // 현재 선택한 일정 ID
+    // 수정·삭제 대상으로 선택한 일정 ID
     let selectedScheduleId = null;
 
     // 현재 캘린더가 보여주는 달
-    let currentCalendarDate = new Date();
+    const currentCalendarDate = new Date();
     currentCalendarDate.setDate(1);
 
-
     // ==============================
-    // 3. 데이터 저장 함수
+    // 3. 서버 요청 공통 함수
     // ==============================
 
-    function saveSubjects() {
-        localStorage.setItem(
-            "planmateSubjects",
-            JSON.stringify(subjects)
-        );
+    async function request(url, options = {}) {
+        const response = await fetch(url, {
+            headers: {
+                "Content-Type": "application/json",
+                ...options.headers
+            },
+            ...options
+        });
+
+        if (!response.ok) {
+            let message = "요청 처리 중 오류가 발생했습니다.";
+
+            try {
+                const errorData = await response.json();
+
+                if (errorData.message) {
+                    message = errorData.message;
+                }
+            } catch (error) {
+                // JSON 형태의 오류 응답이 아니면 기본 문구 사용
+            }
+
+            throw new Error(message);
+        }
+
+        // 삭제 성공처럼 응답 내용이 없는 경우
+        if (response.status === 204) {
+            return null;
+        }
+
+        return response.json();
     }
 
-    function saveSchedules() {
-        localStorage.setItem(
-            "planmateSchedules",
-            JSON.stringify(schedules)
-        );
+    // ==============================
+    // 4. 과목 API
+    // ==============================
+
+    async function loadSubjects() {
+        try {
+            subjects = await request("/api/subjects");
+            renderSubjects();
+        } catch (error) {
+            console.error(error);
+            alert("과목 목록을 불러오지 못했습니다.");
+        }
     }
 
+    async function createSubject(subjectData) {
+        return request("/api/subjects", {
+            method: "POST",
+            body: JSON.stringify(subjectData)
+        });
+    }
+
+    async function updateSubject(subjectId, subjectData) {
+        return request(`/api/subjects/${subjectId}`, {
+            method: "PUT",
+            body: JSON.stringify(subjectData)
+        });
+    }
+
+    async function deleteSubject(subjectId) {
+        return request(`/api/subjects/${subjectId}`, {
+            method: "DELETE"
+        });
+    }
 
     // ==============================
-    // 4. 과목 관리
+    // 5. 일정 API
+    // ==============================
+
+    function getCurrentMonthRange() {
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth();
+
+        const lastDay = new Date(year, month + 1, 0).getDate();
+
+        return {
+            startDate: makeDateKey(year, month, 1),
+            endDate: makeDateKey(year, month, lastDay)
+        };
+    }
+
+    async function loadSchedules() {
+        const { startDate, endDate } = getCurrentMonthRange();
+
+        try {
+            schedules = await request(
+                `/api/schedules?startDate=${startDate}&endDate=${endDate}`
+            );
+
+            renderCalendar();
+        } catch (error) {
+            console.error(error);
+            alert("일정 목록을 불러오지 못했습니다.");
+        }
+    }
+
+    async function createSchedule(scheduleData) {
+        return request("/api/schedules", {
+            method: "POST",
+            body: JSON.stringify(scheduleData)
+        });
+    }
+
+    async function updateSchedule(scheduleId, scheduleData) {
+        return request(`/api/schedules/${scheduleId}`, {
+            method: "PUT",
+            body: JSON.stringify(scheduleData)
+        });
+    }
+
+    async function deleteSchedule(scheduleId) {
+        return request(`/api/schedules/${scheduleId}`, {
+            method: "DELETE"
+        });
+    }
+
+    // ==============================
+    // 6. 과목 화면 관리
     // ==============================
 
     function clearSubjectForm() {
         subjectNameInput.value = "";
         subjectColorInput.value = "#6b7280";
-        selectedSubjectIndex = -1;
+        selectedSubjectId = null;
     }
 
     function renderSubjects() {
-        const previousSelectedSubject = subjectSelect.value;
+        const previousSelectedSubjectId = subjectSelect.value;
 
         subjectList.innerHTML = "";
         subjectSelect.innerHTML = "";
@@ -125,11 +209,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        subjects.forEach((subject, index) => {
+        subjects.forEach((subject) => {
             // 왼쪽 과목 목록
             const listItem = document.createElement("li");
 
-            if (index === selectedSubjectIndex) {
+            if (subject.subjectId === selectedSubjectId) {
                 listItem.classList.add("selected");
             }
 
@@ -138,16 +222,15 @@ document.addEventListener("DOMContentLoaded", () => {
             colorCircle.style.backgroundColor = subject.color;
 
             const nameText = document.createElement("span");
-            nameText.textContent = subject.name;
+            nameText.textContent = subject.subjectName;
 
             listItem.appendChild(colorCircle);
             listItem.appendChild(nameText);
 
-            // 과목을 클릭하면 수정할 과목으로 선택
             listItem.addEventListener("click", () => {
-                selectedSubjectIndex = index;
+                selectedSubjectId = subject.subjectId;
 
-                subjectNameInput.value = subject.name;
+                subjectNameInput.value = subject.subjectName;
                 subjectColorInput.value = subject.color;
 
                 renderSubjects();
@@ -155,71 +238,80 @@ document.addEventListener("DOMContentLoaded", () => {
 
             subjectList.appendChild(listItem);
 
-            // 오른쪽 일정 폼의 과목 선택지
+            // 일정 폼의 과목 선택지
             const option = document.createElement("option");
 
-            option.value = subject.name;
-            option.textContent = subject.name;
+            option.value = String(subject.subjectId);
+            option.textContent = subject.subjectName;
 
             subjectSelect.appendChild(option);
         });
 
-        // 기존에 선택했던 과목이 있으면 유지
-        const subjectExists = subjects.some(
-            (subject) => subject.name === previousSelectedSubject
-        );
+        // 기존에 선택한 과목이 아직 존재하면 선택 유지
+        const subjectExists = subjects.some((subject) => {
+            return String(subject.subjectId) === previousSelectedSubjectId;
+        });
 
         if (subjectExists) {
-            subjectSelect.value = previousSelectedSubject;
+            subjectSelect.value = previousSelectedSubjectId;
         }
     }
 
-    addSubjectBtn.addEventListener("click", () => {
-        const name = subjectNameInput.value.trim();
+    // 과목 등록
+    addSubjectBtn.addEventListener("click", async () => {
+        const subjectName = subjectNameInput.value.trim();
         const color = subjectColorInput.value;
 
-        if (name === "") {
+        if (subjectName === "") {
             alert("과목명을 입력해 주세요.");
             return;
         }
 
-        const duplicate = subjects.some(
-            (subject) => subject.name === name
-        );
+        const duplicate = subjects.some((subject) => {
+            return subject.subjectName === subjectName;
+        });
 
         if (duplicate) {
             alert("이미 등록된 과목입니다.");
             return;
         }
 
-        subjects.push({
-            name: name,
-            color: color
-        });
+        try {
+            await createSubject({
+                subjectName: subjectName,
+                color: color,
+                targetTime: null
+            });
 
-        saveSubjects();
-        clearSubjectForm();
-        renderSubjects();
+            clearSubjectForm();
+            await loadSubjects();
+
+            alert("과목이 등록되었습니다.");
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
     });
 
-    updateSubjectBtn.addEventListener("click", () => {
-        if (selectedSubjectIndex === -1) {
+    // 과목 수정
+    updateSubjectBtn.addEventListener("click", async () => {
+        if (selectedSubjectId === null) {
             alert("수정할 과목을 먼저 선택해 주세요.");
             return;
         }
 
-        const newName = subjectNameInput.value.trim();
-        const newColor = subjectColorInput.value;
+        const subjectName = subjectNameInput.value.trim();
+        const color = subjectColorInput.value;
 
-        if (newName === "") {
+        if (subjectName === "") {
             alert("과목명을 입력해 주세요.");
             return;
         }
 
-        const duplicate = subjects.some((subject, index) => {
+        const duplicate = subjects.some((subject) => {
             return (
-                subject.name === newName &&
-                index !== selectedSubjectIndex
+                subject.subjectName === subjectName &&
+                subject.subjectId !== selectedSubjectId
             );
         });
 
@@ -228,64 +320,67 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const oldName = subjects[selectedSubjectIndex].name;
+        try {
+            await updateSubject(selectedSubjectId, {
+                subjectName: subjectName,
+                color: color,
+                targetTime: null
+            });
 
-        subjects[selectedSubjectIndex] = {
-            name: newName,
-            color: newColor
-        };
+            clearSubjectForm();
 
-        // 과목 이름이 바뀌면 기존 일정의 과목 이름도 함께 변경
-        schedules.forEach((schedule) => {
-            if (schedule.subject === oldName) {
-                schedule.subject = newName;
-            }
-        });
+            await loadSubjects();
+            await loadSchedules();
 
-        saveSubjects();
-        saveSchedules();
-
-        clearSubjectForm();
-        renderSubjects();
-        renderCalendar();
+            alert("과목이 수정되었습니다.");
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
     });
 
-    deleteSubjectBtn.addEventListener("click", () => {
-        if (selectedSubjectIndex === -1) {
+    // 과목 삭제
+    deleteSubjectBtn.addEventListener("click", async () => {
+        if (selectedSubjectId === null) {
             alert("삭제할 과목을 먼저 선택해 주세요.");
             return;
         }
 
-        const selectedSubject = subjects[selectedSubjectIndex];
+        const selectedSubject = subjects.find((subject) => {
+            return subject.subjectId === selectedSubjectId;
+        });
+
+        if (!selectedSubject) {
+            alert("선택한 과목을 찾을 수 없습니다.");
+            return;
+        }
 
         const confirmed = confirm(
-            `"${selectedSubject.name}" 과목과 관련 일정을 모두 삭제하시겠습니까?`
+            `"${selectedSubject.subjectName}" 과목과 관련 일정을 모두 삭제하시겠습니까?`
         );
 
         if (!confirmed) {
             return;
         }
 
-        subjects.splice(selectedSubjectIndex, 1);
+        try {
+            await deleteSubject(selectedSubjectId);
 
-        // 삭제한 과목의 일정도 함께 제거
-        schedules = schedules.filter((schedule) => {
-            return schedule.subject !== selectedSubject.name;
-        });
+            clearSubjectForm();
+            clearScheduleForm();
 
-        saveSubjects();
-        saveSchedules();
+            await loadSubjects();
+            await loadSchedules();
 
-        clearSubjectForm();
-        clearScheduleForm();
-
-        renderSubjects();
-        renderCalendar();
+            alert("과목이 삭제되었습니다.");
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
     });
 
-
     // ==============================
-    // 5. 일정 입력 폼 관리
+    // 7. 일정 입력 폼
     // ==============================
 
     function clearScheduleForm() {
@@ -294,13 +389,15 @@ document.addEventListener("DOMContentLoaded", () => {
         startTimeInput.value = "";
         endTimeInput.value = "";
         memoInput.value = "";
+
+        // HTML 선택지에 예정이 있는 경우
         statusSelect.value = "예정";
 
         selectedScheduleId = null;
     }
 
     function validateScheduleForm() {
-        if (subjects.length === 0) {
+        if (subjects.length === 0 || subjectSelect.value === "") {
             alert("과목을 먼저 추가해 주세요.");
             return false;
         }
@@ -335,9 +432,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function getScheduleFormData() {
         return {
-            subject: subjectSelect.value,
+            subjectId: Number(subjectSelect.value),
             title: titleInput.value.trim(),
-            date: dateInput.value,
+            scheduleDate: dateInput.value,
             startTime: startTimeInput.value,
             endTime: endTimeInput.value,
             memo: memoInput.value.trim(),
@@ -346,27 +443,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 일정 등록
-    addScheduleBtn.addEventListener("click", () => {
+    addScheduleBtn.addEventListener("click", async () => {
         if (!validateScheduleForm()) {
             return;
         }
 
-        const formData = getScheduleFormData();
+        try {
+            await createSchedule(getScheduleFormData());
 
-        schedules.push({
-            id: Date.now(),
-            ...formData
-        });
+            clearScheduleForm();
+            await loadSchedules();
 
-        saveSchedules();
-        clearScheduleForm();
-        renderCalendar();
-
-        alert("일정이 등록되었습니다.");
+            alert("일정이 등록되었습니다.");
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
     });
 
     // 일정 수정
-    updateScheduleBtn.addEventListener("click", () => {
+    updateScheduleBtn.addEventListener("click", async () => {
         if (selectedScheduleId === null) {
             alert("캘린더에서 수정할 일정을 먼저 선택해 주세요.");
             return;
@@ -376,39 +472,35 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const scheduleIndex = schedules.findIndex(
-            (schedule) => schedule.id === selectedScheduleId
-        );
+        try {
+            await updateSchedule(
+                selectedScheduleId,
+                getScheduleFormData()
+            );
 
-        if (scheduleIndex === -1) {
-            alert("선택한 일정을 찾을 수 없습니다.");
-            return;
+            clearScheduleForm();
+            await loadSchedules();
+
+            alert("일정이 수정되었습니다.");
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
         }
-
-        schedules[scheduleIndex] = {
-            id: selectedScheduleId,
-            ...getScheduleFormData()
-        };
-
-        saveSchedules();
-        clearScheduleForm();
-        renderCalendar();
-
-        alert("일정이 수정되었습니다.");
     });
 
     // 일정 삭제
-    deleteScheduleBtn.addEventListener("click", () => {
+    deleteScheduleBtn.addEventListener("click", async () => {
         if (selectedScheduleId === null) {
             alert("캘린더에서 삭제할 일정을 먼저 선택해 주세요.");
             return;
         }
 
-        const selectedSchedule = schedules.find(
-            (schedule) => schedule.id === selectedScheduleId
-        );
+        const selectedSchedule = schedules.find((schedule) => {
+            return schedule.scheduleId === selectedScheduleId;
+        });
 
         if (!selectedSchedule) {
+            alert("선택한 일정을 찾을 수 없습니다.");
             return;
         }
 
@@ -420,18 +512,21 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        schedules = schedules.filter(
-            (schedule) => schedule.id !== selectedScheduleId
-        );
+        try {
+            await deleteSchedule(selectedScheduleId);
 
-        saveSchedules();
-        clearScheduleForm();
-        renderCalendar();
+            clearScheduleForm();
+            await loadSchedules();
+
+            alert("일정이 삭제되었습니다.");
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
     });
 
-
     // ==============================
-    // 6. 캘린더 만들기
+    // 8. 캘린더
     // ==============================
 
     function makeDateKey(year, month, day) {
@@ -441,23 +536,33 @@ document.addEventListener("DOMContentLoaded", () => {
         return `${year}-${formattedMonth}-${formattedDay}`;
     }
 
-    function getSubjectColor(subjectName) {
-        const subject = subjects.find(
-            (item) => item.name === subjectName
-        );
+    function getSubject(subjectId) {
+        return subjects.find((subject) => {
+            return subject.subjectId === subjectId;
+        });
+    }
+
+    function getSubjectColor(subjectId) {
+        const subject = getSubject(subjectId);
 
         return subject ? subject.color : "#6b7280";
     }
 
-    function selectSchedule(schedule) {
-        selectedScheduleId = schedule.id;
+    function getSubjectName(subjectId) {
+        const subject = getSubject(subjectId);
 
-        subjectSelect.value = schedule.subject;
+        return subject ? subject.subjectName : "알 수 없는 과목";
+    }
+
+    function selectSchedule(schedule) {
+        selectedScheduleId = schedule.scheduleId;
+
+        subjectSelect.value = String(schedule.subjectId);
         titleInput.value = schedule.title;
-        dateInput.value = schedule.date;
-        startTimeInput.value = schedule.startTime;
-        endTimeInput.value = schedule.endTime;
-        memoInput.value = schedule.memo;
+        dateInput.value = schedule.scheduleDate;
+        startTimeInput.value = schedule.startTime || "";
+        endTimeInput.value = schedule.endTime || "";
+        memoInput.value = schedule.memo || "";
         statusSelect.value = schedule.status;
 
         renderCalendar();
@@ -470,10 +575,7 @@ document.addEventListener("DOMContentLoaded", () => {
         calendarTitle.textContent = `${year}년 ${month + 1}월`;
         calendarDates.innerHTML = "";
 
-        // 해당 달 1일의 요일
         const firstDayIndex = new Date(year, month, 1).getDay();
-
-        // 해당 달 마지막 날짜
         const lastDate = new Date(year, month + 1, 0).getDate();
 
         // 첫째 날 앞의 빈칸
@@ -484,7 +586,6 @@ document.addEventListener("DOMContentLoaded", () => {
             calendarDates.appendChild(emptyCell);
         }
 
-        // 날짜 생성
         for (let day = 1; day <= lastDate; day++) {
             const dateCell = document.createElement("div");
             const dateNumber = document.createElement("span");
@@ -494,7 +595,7 @@ document.addEventListener("DOMContentLoaded", () => {
             dateNumber.textContent = day;
             dateCell.appendChild(dateNumber);
 
-            // 날짜 칸을 클릭하면 일정 폼의 날짜 자동 입력
+            // 날짜를 누르면 일정 입력칸에 날짜 자동 입력
             dateCell.addEventListener("click", () => {
                 dateInput.value = dateKey;
             });
@@ -510,36 +611,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 dateCell.classList.add("today");
             }
 
-            // 이 날짜에 등록된 일정만 가져오기
-            const dateSchedules = schedules.filter(
-                (schedule) => schedule.date === dateKey
-            );
+            // 해당 날짜의 일정만 가져오기
+            const dateSchedules = schedules.filter((schedule) => {
+                return schedule.scheduleDate === dateKey;
+            });
 
             dateSchedules.forEach((schedule) => {
                 const scheduleItem = document.createElement("p");
 
                 scheduleItem.className = "schedule-item";
 
-                if (schedule.status === "완료") {
+                if (
+                    schedule.status === "완료" ||
+                    schedule.status === "COMPLETED"
+                ) {
                     scheduleItem.classList.add("completed");
                 }
 
-                if (schedule.id === selectedScheduleId) {
+                if (schedule.scheduleId === selectedScheduleId) {
                     scheduleItem.classList.add("selected-schedule");
                 }
 
                 scheduleItem.style.borderLeftColor =
-                    getSubjectColor(schedule.subject);
+                    getSubjectColor(schedule.subjectId);
 
                 scheduleItem.textContent =
-                    `${schedule.startTime} ${schedule.title}`;
+                    `${schedule.startTime || ""} ${schedule.title}`;
 
                 scheduleItem.title =
-                    `${schedule.subject}\n` +
-                    `${schedule.startTime}~${schedule.endTime}\n` +
-                    `${schedule.memo}`;
+                    `${getSubjectName(schedule.subjectId)}\n` +
+                    `${schedule.startTime || ""}~${schedule.endTime || ""}\n` +
+                    `${schedule.memo || ""}`;
 
-                // 일정 클릭 시 수정·삭제할 일정으로 선택
                 scheduleItem.addEventListener("click", (event) => {
                     event.stopPropagation();
                     selectSchedule(schedule);
@@ -553,34 +656,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 이전 달
-    prevMonthBtn.addEventListener("click", () => {
+    prevMonthBtn.addEventListener("click", async () => {
         currentCalendarDate.setMonth(
             currentCalendarDate.getMonth() - 1
         );
 
-        renderCalendar();
+        selectedScheduleId = null;
+        await loadSchedules();
     });
 
     // 다음 달
-    nextMonthBtn.addEventListener("click", () => {
+    nextMonthBtn.addEventListener("click", async () => {
         currentCalendarDate.setMonth(
             currentCalendarDate.getMonth() + 1
         );
 
-        renderCalendar();
+        selectedScheduleId = null;
+        await loadSchedules();
     });
 
-    // 위쪽 + 일정 등록 버튼
-    openScheduleFormBtn.addEventListener("click", () => {
-        clearScheduleForm();
-        titleInput.focus();
-    });
-
+    // 위쪽 일정 등록 버튼
+    if (openScheduleFormBtn) {
+        openScheduleFormBtn.addEventListener("click", () => {
+            clearScheduleForm();
+            titleInput.focus();
+        });
+    }
 
     // ==============================
-    // 7. 처음 화면 표시
+    // 9. 처음 화면 표시
     // ==============================
 
-    renderSubjects();
-    renderCalendar();
+    async function initialize() {
+        await loadSubjects();
+        await loadSchedules();
+    }
+
+    initialize();
 });
