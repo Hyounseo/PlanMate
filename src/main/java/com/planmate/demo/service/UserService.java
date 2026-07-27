@@ -31,7 +31,11 @@ public class UserService {
 
     // 로그인
     @Transactional
-    public String login(String loginId, String password) {
+    public String login(
+            String loginId,
+            String password,
+            HttpSession session
+    ) {
 
         User user = userRepository
                 .findByLoginId(loginId)
@@ -50,8 +54,13 @@ public class UserService {
         if (user.getPassword().equals(password)) {
 
             user.setFailCount(0);
-
             userRepository.save(user);
+
+            // 기존 로그인 아이디 저장
+            session.setAttribute("loggedInUser", loginId);
+
+            // 일정·통계 기능에서 사용할 숫자 사용자 번호 저장
+            session.setAttribute("userId", user.getId());
 
             return "로그인 성공";
 
@@ -65,7 +74,6 @@ public class UserService {
             if (user.getFailCount() >= 5) {
 
                 user.setLocked(true);
-
                 userRepository.save(user);
 
                 return "5회 오류로 계정이 잠겼습니다. 2차 비밀번호를 입력해주세요.";
@@ -79,7 +87,7 @@ public class UserService {
         }
     }
 
-    // 2차 비밀번호 인증 → 바로 로그인
+    // 2차 비밀번호 인증 → 잠금 해제 후 바로 로그인
     @Transactional
     public String unlockAccount(
             String loginId,
@@ -104,25 +112,19 @@ public class UserService {
 
             // 잠금 해제
             user.setLocked(false);
-
             user.setFailCount(0);
 
             userRepository.save(user);
 
-            // 바로 로그인 처리
-            session.setAttribute(
-                    "loggedInUser",
-                    loginId
-            );
+            // 로그인 정보 저장
+            session.setAttribute("loggedInUser", loginId);
+            session.setAttribute("userId", user.getId());
 
             return "2차 비밀번호 인증 성공. 로그인되었습니다.";
 
         } else {
 
             return "2차 비밀번호가 틀렸습니다.";
-
         }
-
     }
-
 }
