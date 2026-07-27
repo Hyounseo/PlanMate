@@ -1,5 +1,6 @@
 package com.planmate.demo.controller;
 
+import com.planmate.demo.domain.User;
 import com.planmate.demo.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/signup")
-    public String signup(@ModelAttribute com.planmate.demo.domain.User user) {
+    public String signup(@ModelAttribute User user) {
         return userService.registerUser(user);
     }
 
@@ -27,14 +28,11 @@ public class UserController {
             @RequestParam String password,
             HttpSession session
     ) {
-
-        String result = userService.login(loginId, password);
-
-        if (result.equals("로그인 성공")) {
-            session.setAttribute("loggedInUser", loginId);
-        }
-
-        return result;
+        return userService.login(
+                loginId,
+                password,
+                session
+        );
     }
 
     // 2차 비밀번호로 잠금 해제 + 바로 로그인
@@ -44,7 +42,6 @@ public class UserController {
             @RequestParam String secondPassword,
             HttpSession session
     ) {
-
         return userService.unlockAccount(
                 loginId,
                 secondPassword,
@@ -56,6 +53,7 @@ public class UserController {
     @PostMapping("/logout")
     public String logout(HttpSession session) {
 
+        // loggedInUser와 userId를 포함한 세션 전체 삭제
         session.invalidate();
 
         return "로그아웃 되었습니다.";
