@@ -17,40 +17,44 @@ public class SubjectController {
         this.subjectService = subjectService;
     }
 
-    // 로그인 기능 통합 전 임시 사용자 번호
-    private static final Long TEMP_USER_ID = 1L;
-
-    // 과목 목록 조회
+    // 로그인한 사용자의 과목 목록 조회
     @GetMapping
-    public List<Subject> getSubjects() {
-        return subjectService.getSubjects(TEMP_USER_ID);
+    public List<Subject> getSubjects(
+            @SessionAttribute("userId") Long userId
+    ) {
+        return subjectService.getSubjects(userId);
     }
 
-    // 새 과목 등록
+    // 로그인한 사용자의 새 과목 등록
     @PostMapping
-    public Subject createSubject(@RequestBody Subject request) {
-        return subjectService.createSubject(TEMP_USER_ID, request);
+    public Subject createSubject(
+            @SessionAttribute("userId") Long userId,
+            @RequestBody Subject request
+    ) {
+        return subjectService.createSubject(userId, request);
     }
 
-    // 과목 수정
+    // 로그인한 사용자의 과목 수정
     @PutMapping("/{subjectId}")
     public Subject updateSubject(
+            @SessionAttribute("userId") Long userId,
             @PathVariable Long subjectId,
             @RequestBody Subject request
     ) {
         return subjectService.updateSubject(
                 subjectId,
-                TEMP_USER_ID,
+                userId,
                 request
         );
     }
 
-    // 과목 삭제
+    // 로그인한 사용자의 과목 삭제
     @DeleteMapping("/{subjectId}")
     public ResponseEntity<Void> deleteSubject(
+            @SessionAttribute("userId") Long userId,
             @PathVariable Long subjectId
     ) {
-        subjectService.deleteSubject(subjectId, TEMP_USER_ID);
+        subjectService.deleteSubject(subjectId, userId);
 
         return ResponseEntity.noContent().build();
     }

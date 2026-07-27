@@ -18,53 +18,55 @@ public class ScheduleController {
         this.scheduleService = scheduleService;
     }
 
-    // 로그인 기능 통합 전 임시 사용자 번호
-    private static final Long TEMP_USER_ID = 1L;
-
-    // 특정 기간의 일정 조회
-    // 예: /api/schedules?startDate=2026-07-01&endDate=2026-07-31
+    // 로그인한 사용자의 특정 기간 일정 조회
     @GetMapping
     public List<Schedule> getSchedules(
+            @SessionAttribute("userId") Long userId,
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate
     ) {
         return scheduleService.getSchedules(
-                TEMP_USER_ID,
+                userId,
                 startDate,
                 endDate
         );
     }
 
-    // 새 일정 등록
+    // 로그인한 사용자의 일정 등록
     @PostMapping
-    public Schedule createSchedule(@RequestBody Schedule request) {
+    public Schedule createSchedule(
+            @SessionAttribute("userId") Long userId,
+            @RequestBody Schedule request
+    ) {
         return scheduleService.createSchedule(
-                TEMP_USER_ID,
+                userId,
                 request
         );
     }
 
-    // 일정 수정
+    // 로그인한 사용자의 일정 수정
     @PutMapping("/{scheduleId}")
     public Schedule updateSchedule(
+            @SessionAttribute("userId") Long userId,
             @PathVariable Long scheduleId,
             @RequestBody Schedule request
     ) {
         return scheduleService.updateSchedule(
                 scheduleId,
-                TEMP_USER_ID,
+                userId,
                 request
         );
     }
 
-    // 일정 삭제
+    // 로그인한 사용자의 일정 삭제
     @DeleteMapping("/{scheduleId}")
     public ResponseEntity<Void> deleteSchedule(
+            @SessionAttribute("userId") Long userId,
             @PathVariable Long scheduleId
     ) {
         scheduleService.deleteSchedule(
                 scheduleId,
-                TEMP_USER_ID
+                userId
         );
 
         return ResponseEntity.noContent().build();
