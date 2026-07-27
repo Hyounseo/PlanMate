@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>공부시간 기록 - PlanMate</title>
+    <!-- 공통 레이아웃(Header/Sidebar/Footer)은 팀원4가 만들면 그 안에 이 내용만 옮겨 넣으면 됨 -->
+    <link rel="stylesheet" th:href="@{/css/record.css}">
+</head>
+<body>
+
+<div class="record-container">
+    <h2>공부시간 기록</h2>
+
+    <!-- 타이머 카드 -->
+    <div class="timer-card">
+        <!-- TODO: 과목 목록은 팀원2(Subject) API 나오면 여기 <select> 옵션 자동 채우기 -->
+        <select id="subjectSelect">
+            <option value="1">과목 예시 1</option>
+            <option value="2">과목 예시 2</option>
+        </select>
+
+        <div class="timer-display" id="timerDisplay">00:00:00</div>
+
+        <div class="timer-buttons">
+            <button id="startBtn" class="btn btn-start">시작</button>
+            <button id="stopBtn" class="btn btn-stop" disabled>종료</button>
+        </div>
+
+        <p id="statusMessage" class="status-message"></p>
+    </div>
+
+    <!-- 오늘 기록 리스트 -->
+    <div class="today-records">
+        <h3>오늘 공부 기록</h3>
+        <table id="recordTable">
+            <thead>
+            <tr>
+                <th>과목</th>
+                <th>시작</th>
+                <th>종료</th>
+                <th>공부시간</th>
+            </tr>
+            </thead>
+            <tbody id="recordTableBody">
+            <!-- JS로 채워짐 -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script th:src="@{/js/record.js}"></script>
+</body>
+</html>
