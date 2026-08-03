@@ -1,53 +1,167 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>공부시간 기록 - PlanMate</title>
-    <!-- 공통 레이아웃(Header/Sidebar/Footer)은 팀원4가 만들면 그 안에 이 내용만 옮겨 넣으면 됨 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PlanMate - 공부시간 기록</title>
+
+    <!-- 공통 레이아웃 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+
+    <!-- 공부 기록 전용 스타일 -->
     <link rel="stylesheet" th:href="@{/css/record.css}">
 </head>
+
 <body>
 
-<div class="record-container">
-    <h2>공부시간 기록</h2>
+<!-- 공통 Header -->
+<div th:replace="~{fragments/header :: header}"></div>
 
-    <!-- 타이머 카드 -->
-    <div class="timer-card">
-        <!-- TODO: 과목 목록은 팀원2(Subject) API 나오면 여기 <select> 옵션 자동 채우기 -->
-        <select id="subjectSelect">
-            <option value="1">과목 예시 1</option>
-            <option value="2">과목 예시 2</option>
-        </select>
+<!-- Sidebar + 본문 -->
+<div class="site-layout">
 
-        <div class="timer-display" id="timerDisplay">00:00:00</div>
+    <!-- 공통 Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-        <div class="timer-buttons">
-            <button id="startBtn" class="btn btn-start">시작</button>
-            <button id="stopBtn" class="btn btn-stop" disabled>종료</button>
+    <!-- 공부 기록 본문 -->
+    <main class="record-page">
+
+        <div class="record-page-header">
+            <div>
+                <p class="section-label">STUDY RECORD</p>
+
+                <h1>공부시간 기록</h1>
+
+                <p class="record-page-description">
+                    과목을 선택하고 타이머를 실행해 오늘의 공부시간을 기록해보세요.
+                </p>
+            </div>
         </div>
 
-        <p id="statusMessage" class="status-message"></p>
-    </div>
+        <div class="record-layout">
 
-    <!-- 오늘 기록 리스트 -->
-    <div class="today-records">
-        <h3>오늘 공부 기록</h3>
-        <table id="recordTable">
-            <thead>
-            <tr>
-                <th>과목</th>
-                <th>시작</th>
-                <th>종료</th>
-                <th>공부시간</th>
-            </tr>
-            </thead>
-            <tbody id="recordTableBody">
-            <!-- JS로 채워짐 -->
-            </tbody>
-        </table>
-    </div>
+            <!-- 타이머 카드 -->
+            <section class="timer-card">
+
+                <div class="card-heading">
+
+                    <div>
+                        <p class="card-label">TIMER</p>
+                        <h2>공부 타이머</h2>
+                    </div>
+
+                    <div class="timer-icon">
+                        ⏱️
+                    </div>
+
+                </div>
+
+                <div class="timer-form-group">
+
+                    <label for="subjectSelect">
+                        공부할 과목
+                    </label>
+
+                    <!-- 실제 과목 목록은 record.js가 API로 불러와서 채움 -->
+                    <select id="subjectSelect">
+                        <option value="">
+                            과목을 불러오는 중입니다...
+                        </option>
+                    </select>
+
+                </div>
+
+                <div
+                        class="timer-display"
+                        id="timerDisplay">
+                    00:00:00
+                </div>
+
+                <div class="timer-buttons">
+
+                    <button
+                            type="button"
+                            id="startBtn"
+                            class="timer-button start-button"
+                            disabled>
+                        시작
+                    </button>
+
+                    <button
+                            type="button"
+                            id="stopBtn"
+                            class="timer-button stop-button"
+                            disabled>
+                        종료
+                    </button>
+
+                </div>
+
+                <p
+                        id="statusMessage"
+                        class="status-message">
+                </p>
+
+            </section>
+
+            <!-- 오늘 공부 기록 -->
+            <section class="today-records">
+
+                <div class="records-header">
+
+                    <div>
+                        <p class="card-label">TODAY</p>
+                        <h2>오늘 공부 기록</h2>
+                    </div>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table id="recordTable">
+
+                        <thead>
+                        <tr>
+                            <th>과목</th>
+                            <th>시작</th>
+                            <th>종료</th>
+                            <th>공부시간</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="recordTableBody">
+
+                        <!-- record.js가 실제 오늘 기록으로 교체 -->
+                        <tr class="empty-record-row">
+                            <td colspan="4">
+                                오늘 등록된 공부 기록이 없습니다.
+                            </td>
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
 </div>
 
+<!-- 공통 Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- 공부 기록 기능 -->
 <script th:src="@{/js/record.js}"></script>
+
+<!-- 로그아웃 기능 -->
+<script th:replace="~{fragments/header :: logoutScript}"></script>
+
 </body>
 </html>

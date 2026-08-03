@@ -1,89 +1,278 @@
-.record-container {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 0 20px;
-    font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-.record-container h2 {
+/* =========================
+   Record Page
+========================= */
+
+.record-page {
+    width: 100%;
+    min-width: 0;
+    flex: 1;
+    padding: 40px;
+}
+
+.record-page-header {
+    margin-bottom: 30px;
+}
+
+.record-page-header h1 {
+    margin-bottom: 10px;
+    color: #1f3045;
+    font-size: 34px;
+}
+
+.record-page-description {
+    color: #7a8798;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.section-label,
+.card-label {
+    margin-bottom: 7px;
+    color: #6c63ff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+/* =========================
+   Main Layout
+========================= */
+
+.record-layout {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.8fr) minmax(520px, 1.2fr);
+    gap: 24px;
+    align-items: start;
+}
+
+/* =========================
+   Common Cards
+========================= */
+
+.timer-card,
+.today-records {
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid #e9edf3;
+    border-radius: 22px;
+    box-shadow: 0 12px 32px rgba(38, 57, 83, 0.07);
+}
+
+.card-heading,
+.records-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 24px;
 }
 
-.timer-card {
-    background: #f5f5f7;
-    border-radius: 16px;
-    padding: 32px;
-    text-align: center;
-    margin-bottom: 32px;
+.card-heading h2,
+.records-header h2 {
+    color: #27394e;
+    font-size: 22px;
 }
 
-#subjectSelect {
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+.timer-icon {
+    display: flex;
+    width: 52px;
+    height: 52px;
+    align-items: center;
+    justify-content: center;
+    background: #efedff;
+    border-radius: 15px;
+    font-size: 24px;
+}
+
+/* =========================
+   Timer Area
+========================= */
+
+.timer-form-group {
+    margin-bottom: 24px;
+}
+
+.timer-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #44566b;
     font-size: 14px;
-    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.timer-form-group select {
+    width: 100%;
+    height: 50px;
+    padding: 0 14px;
+    background: #fbfcfe;
+    border: 1px solid #dce2ea;
+    border-radius: 12px;
+    color: #26384d;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.timer-form-group select:focus {
+    border-color: #7b73ed;
+    box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.11);
 }
 
 .timer-display {
-    font-size: 48px;
-    font-weight: 700;
+    margin: 28px 0;
+    padding: 28px 20px;
+    background: linear-gradient(135deg, #f4f2ff, #faf9ff);
+    border: 1px solid #e5e1ff;
+    border-radius: 20px;
+    color: #5149c8;
+    font-size: clamp(42px, 5vw, 64px);
+    font-weight: 800;
     letter-spacing: 2px;
-    margin-bottom: 20px;
-    color: #222;
+    text-align: center;
 }
 
 .timer-buttons {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
 
-.btn {
-    padding: 12px 32px;
+.timer-button {
+    height: 50px;
     border: none;
-    border-radius: 24px;
+    border-radius: 13px;
+    color: #ffffff;
+    font-family: inherit;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 800;
     cursor: pointer;
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            opacity 0.2s ease;
 }
 
+.timer-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.start-button,
 .btn-start {
-    background: #7C9EFF;
-    color: #fff;
+    background: linear-gradient(90deg, #685fee, #8276f2);
+    box-shadow: 0 10px 24px rgba(108, 99, 255, 0.22);
 }
 
+.stop-button,
 .btn-stop {
-    background: #FF7C7C;
-    color: #fff;
+    background: linear-gradient(90deg, #ef6f6f, #f28a7c);
+    box-shadow: 0 10px 24px rgba(239, 111, 111, 0.2);
 }
 
+.timer-button:disabled,
 .btn:disabled {
-    background: #ddd;
-    color: #999;
+    background: #e3e6eb;
+    color: #9da6b2;
     cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 .status-message {
-    margin-top: 12px;
+    min-height: 20px;
+    margin-top: 14px;
+    color: #d24e4e;
     font-size: 13px;
-    color: #e74c3c;
-    min-height: 16px;
+    line-height: 1.5;
+}
+
+/* =========================
+   Record Table
+========================= */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
 }
 
 .today-records table {
     width: 100%;
+    min-width: 620px;
     border-collapse: collapse;
 }
 
-.today-records th, .today-records td {
-    padding: 10px 8px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
+.today-records th,
+.today-records td {
+    padding: 15px 12px;
+    border-bottom: 1px solid #edf0f4;
+    color: #516174;
     font-size: 14px;
+    text-align: center;
 }
 
 .today-records th {
-    color: #666;
-    font-weight: 600;
+    background: #f7f8fb;
+    color: #5f6e80;
+    font-weight: 800;
+}
+
+.today-records tbody tr {
+    transition: background 0.2s ease;
+}
+
+.today-records tbody tr:hover {
+    background: #faf9ff;
+}
+
+.empty-record-row td {
+    padding: 38px 15px;
+    color: #98a3b2;
+    text-align: center;
+}
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1050px) {
+    .record-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 850px) {
+    .record-page {
+        padding: 28px 22px 44px;
+    }
+}
+
+@media (max-width: 500px) {
+    .record-page {
+        padding: 24px 14px 36px;
+    }
+
+    .record-page-header h1 {
+        font-size: 28px;
+    }
+
+    .timer-card,
+    .today-records {
+        padding: 22px;
+    }
+
+    .timer-display {
+        padding: 24px 12px;
+        font-size: 40px;
+    }
+
+    .timer-buttons {
+        grid-template-columns: 1fr;
+    }
 }

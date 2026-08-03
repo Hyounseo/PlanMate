@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PlanMate - 학습 목표</title>
+
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/goal.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="site-layout">
+
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="goal-page">
+
+        <div class="goal-page-header">
+            <div>
+                <p class="section-label">GOAL</p>
+                <h1>학습 목표 관리</h1>
+                <p class="goal-description">
+                    목표일과 하루 목표 공부시간을 설정해 학습 진행 상황을 관리해보세요.
+                </p>
+            </div>
+        </div>
+
+        <div class="goal-layout">
+
+            <!-- 목표 입력 폼 -->
+            <section class="goal-card">
+
+                <div class="goal-card-header">
+                    <div>
+                        <p class="card-label">GOAL FORM</p>
+                        <h2 id="formTitle">새 목표 등록</h2>
+                    </div>
+
+                    <div class="goal-icon">🎯</div>
+                </div>
+
+                <form id="goalForm">
+
+                    <input type="hidden" id="goalId">
+
+                    <div class="form-group">
+                        <label for="goalTitle">목표명</label>
+
+                        <input
+                                type="text"
+                                id="goalTitle"
+                                placeholder="예: SQLD 시험 합격"
+                                required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goalDate">목표일</label>
+
+                        <input
+                                type="date"
+                                id="goalDate"
+                                required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="targetHours">하루 목표 공부시간</label>
+
+                        <input
+                                type="number"
+                                id="targetHours"
+                                min="1"
+                                max="24"
+                                placeholder="예: 3"
+                                required>
+
+                        <p class="input-help">
+                            1시간부터 24시간 사이로 입력해주세요.
+                        </p>
+                    </div>
+
+                    <p id="goalMessage" class="form-message"></p>
+
+                    <div class="goal-button-row">
+
+                        <button
+                                type="submit"
+                                id="saveGoalBtn"
+                                class="primary-button">
+                            목표 저장
+                        </button>
+
+                        <button
+                                type="button"
+                                id="resetGoalBtn">
+                            입력 초기화
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+            <!-- 현재 목표 -->
+            <section class="goal-card">
+
+                <div class="goal-card-header">
+                    <div>
+                        <p class="card-label">CURRENT GOAL</p>
+                        <h2>현재 목표</h2>
+                    </div>
+                </div>
+
+                <div id="emptyGoal" class="empty-goal">
+                    등록된 목표가 없습니다.
+                </div>
+
+                <div id="currentGoal" class="current-goal" hidden>
+
+                    <div class="current-goal-title-wrap">
+                        <span class="current-goal-badge">진행 중</span>
+                        <h3 id="currentGoalTitle">목표명</h3>
+                    </div>
+
+                    <dl class="goal-info-list">
+                        <div>
+                            <dt>목표일</dt>
+                            <dd id="currentGoalDate">-</dd>
+                        </div>
+
+                        <div>
+                            <dt>D-Day</dt>
+                            <dd id="currentGoalDDay">-</dd>
+                        </div>
+
+                        <div>
+                            <dt>하루 목표시간</dt>
+                            <dd id="currentGoalHours">-</dd>
+                        </div>
+                    </dl>
+
+                    <div class="goal-action-row">
+
+                        <button
+                                type="button"
+                                id="editGoalBtn"
+                                class="primary-button">
+                            수정
+                        </button>
+
+                        <button
+                                type="button"
+                                id="deleteGoalBtn"
+                                class="danger-button">
+                            삭제
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script th:src="@{/js/goal.js}"></script>
+<script th:replace="~{fragments/header :: logoutScript}"></script>
+
+</body>
+</html>

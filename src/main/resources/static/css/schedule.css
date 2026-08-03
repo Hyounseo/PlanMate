@@ -4,70 +4,77 @@
     padding: 0;
 }
 
-body {
-    min-width: 1200px;
-    background: #f3f4f6;
-    color: #222;
-    font-family: Arial, sans-serif;
-}
-
-.header {
-    height: 72px;
-    padding: 0 40px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    background: #d8d8d8;
-}
-
-.header h1 {
-    font-size: 24px;
-}
-
-.header p {
-    font-size: 17px;
-}
-
-.user-menu {
-    margin-left: auto;
-}
+/* =========================
+   Schedule Page Layout
+========================= */
 
 .page {
-    padding: 28px;
+    width: 100%;
+    min-width: 0;
+    flex: 1;
+    padding: 40px;
 }
 
 .page-title {
-    margin-bottom: 20px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
 }
 
 .page-title h2 {
-    margin-bottom: 7px;
+    margin-bottom: 8px;
+    color: #1f3045;
+    font-size: 32px;
 }
 
-.page-title p {
-    color: #666;
+.page-title > div > p:last-child {
+    color: #7a8798;
+    font-size: 15px;
+    line-height: 1.6;
 }
+
+.section-label {
+    margin-bottom: 7px;
+    color: #6c63ff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+/* =========================
+   Three-column Schedule Area
+========================= */
 
 .schedule-layout {
     display: grid;
-    grid-template-columns: 230px minmax(600px, 1fr) 300px;
-    gap: 18px;
+    grid-template-columns: 260px minmax(560px, 1fr) 320px;
+    gap: 22px;
     align-items: start;
 }
 
+/* =========================
+   Common Cards
+========================= */
+
 .card {
-    padding: 20px;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid #e9edf3;
+    border-radius: 20px;
+    box-shadow: 0 12px 32px rgba(38, 57, 83, 0.07);
 }
 
 .card h3 {
-    margin-bottom: 18px;
+    margin-bottom: 20px;
+    color: #27394e;
+    font-size: 20px;
 }
+
+/* =========================
+   Subject Panel
+========================= */
 
 .subject-list {
     margin-bottom: 24px;
@@ -75,161 +82,313 @@ body {
 }
 
 .subject-list li {
-    padding: 12px 6px;
-    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    padding: 12px 10px;
+    border-bottom: 1px solid #edf0f4;
+    color: #516174;
+    font-size: 14px;
+    cursor: pointer;
+    transition:
+            background 0.2s ease,
+            color 0.2s ease;
+}
+
+.subject-list li:hover {
+    background: #f5f3ff;
+    color: #6259e7;
+}
+
+.subject-list li.selected {
+    background: #efedff;
+    color: #6259e7;
+    font-weight: 700;
 }
 
 .subject-color {
+    display: inline-block;
     width: 12px;
     height: 12px;
     margin-right: 8px;
-    display: inline-block;
-    background: #888;
+    background: #888888;
     border-radius: 50%;
 }
 
+/* =========================
+   Form Elements
+========================= */
+
 label {
-    margin: 12px 0 6px;
     display: block;
+    margin: 14px 0 7px;
+    color: #516174;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 700;
 }
 
 input,
 select,
 textarea {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #bbb;
-    border-radius: 4px;
+    padding: 11px 12px;
+    background: #ffffff;
+    border: 1px solid #d8dee8;
+    border-radius: 10px;
+    color: #26384d;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
 }
 
-textarea {
-    height: 80px;
-    resize: none;
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #8078ef;
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
 }
 
-.button-row {
-    margin-top: 18px;
-    display: flex;
-    gap: 7px;
-}
-
-button {
-    padding: 10px 14px;
-    border: 0;
-    border-radius: 4px;
-    background: #d8d8d8;
+input[type="color"] {
+    height: 44px;
+    padding: 5px;
     cursor: pointer;
 }
 
+textarea {
+    min-height: 88px;
+    resize: vertical;
+}
+
+/* =========================
+   Buttons
+========================= */
+
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 15px;
+    background: #eef1f5;
+    border: none;
+    border-radius: 10px;
+    color: #4f5f72;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+            background 0.2s ease,
+            color 0.2s ease,
+            transform 0.2s ease;
+}
+
+button:hover {
+    background: #e3e7ed;
+    transform: translateY(-1px);
+}
+
 .primary-button {
-    background: #555;
-    color: white;
+    background: #6c63ff;
+    color: #ffffff;
+}
+
+.primary-button:hover {
+    background: #5d55e8;
 }
 
 .danger-button {
-    background: #eee;
-    color: #b42318;
+    background: #fff0f0;
+    color: #d14a4a;
+}
+
+.danger-button:hover {
+    background: #ffe2e2;
+}
+
+/* =========================
+   Calendar
+========================= */
+
+.calendar-panel {
+    min-width: 0;
 }
 
 .calendar-header {
-    margin-bottom: 15px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     gap: 20px;
+    margin-bottom: 18px;
 }
 
 .calendar-header h3 {
+    min-width: 150px;
     margin: 0;
+    text-align: center;
+}
+
+.calendar-header button {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    font-size: 18px;
 }
 
 .calendar-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .weekday div {
-    padding: 10px;
+    padding: 12px 6px;
+    background: #f3f5f8;
+    border: 1px solid #e2e6ec;
+    color: #516174;
+    font-size: 14px;
+    font-weight: 800;
     text-align: center;
-    font-weight: bold;
-    background: #eee;
-    border: 1px solid #ddd;
+}
+
+.weekday div:first-child {
+    color: #e05656;
+}
+
+.weekday div:last-child {
+    color: #4f6fd8;
 }
 
 .dates > div {
-    min-height: 92px;
-    padding: 8px;
-    border: 1px solid #ddd;
-}
-
-.empty {
-    background: #f7f7f7;
-}
-
-.schedule-item {
-    margin-top: 8px;
-    padding: 5px;
-    background: #ddd;
-    border-radius: 3px;
-    font-size: 12px;
-}
-.subject-list li {
-    cursor: pointer;
-}
-
-.subject-list li:hover {
-    background: #f3f4f6;
-}
-
-.subject-list li.selected {
-    background: #e5e7eb;
-    font-weight: bold;
-}
-.subject-list li {
-    cursor: pointer;
-}
-
-.subject-list li:hover {
-    background: #f3f4f6;
-}
-
-.subject-list li.selected {
-    background: #e5e7eb;
-    font-weight: bold;
-}
-
-.dates > div {
-    cursor: pointer;
+    min-height: 110px;
+    padding: 10px;
     overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e2e6ec;
+    color: #39495d;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
 .dates > div:hover {
-    background: #f9fafb;
+    background: #faf9ff;
 }
 
 .dates > div.today {
-    background: #fff7d6;
+    background: #fff9df;
+}
+
+.dates > div.empty {
+    background: #f8f9fb;
+    cursor: default;
+}
+
+.dates > div > span {
+    display: inline-block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .schedule-item {
-    border-left: 5px solid #6b7280;
-    cursor: pointer;
-    white-space: nowrap;
+    margin-top: 7px;
+    padding: 7px 8px;
     overflow: hidden;
+    background: #efedff;
+    border-left: 4px solid #6c63ff;
+    border-radius: 7px;
+    color: #5149c8;
+    font-size: 12px;
+    line-height: 1.3;
+    white-space: nowrap;
     text-overflow: ellipsis;
+    cursor: pointer;
 }
 
 .schedule-item:hover {
-    filter: brightness(0.95);
+    filter: brightness(0.97);
 }
 
 .schedule-item.completed {
+    opacity: 0.55;
     text-decoration: line-through;
-    opacity: 0.6;
 }
 
 .schedule-item.selected-schedule {
-    outline: 2px solid #333;
+    outline: 2px solid #6c63ff;
+}
+
+/* =========================
+   Schedule Form Panel
+========================= */
+
+.schedule-form-panel {
+    position: sticky;
+    top: 94px;
+}
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1280px) {
+    .schedule-layout {
+        grid-template-columns: 240px minmax(500px, 1fr);
+    }
+
+    .schedule-form-panel {
+        position: static;
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 950px) {
+    .page {
+        padding: 28px 22px 44px;
+    }
+
+    .page-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .schedule-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .subject-panel,
+    .calendar-panel,
+    .schedule-form-panel {
+        grid-column: auto;
+    }
+
+    .calendar-panel {
+        overflow-x: auto;
+    }
+
+    .calendar-grid {
+        min-width: 700px;
+    }
+}
+
+@media (max-width: 500px) {
+    .page {
+        padding: 24px 14px 36px;
+    }
+
+    .page-title h2 {
+        font-size: 27px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .button-row button {
+        flex: 1;
+    }
 }

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<header th:fragment="header" class="site-header">
+
+    <div class="header-logo">
+        <a th:href="@{/dashboard}">
+            📘 PlanMate
+        </a>
+    </div>
+
+    <div class="header-user">
+
+        <span
+                class="header-user-name"
+                th:text="${session.userName != null}
+                    ? |${session.userName}님|
+                    : '사용자님'">
+            사용자님
+        </span>
+
+        <button
+                type="button"
+                class="logout-button"
+                id="logoutButton">
+            로그아웃
+        </button>
+
+    </div>
+
+</header>
+
+<script th:fragment="logoutScript">
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const logoutButton = document.getElementById("logoutButton");
+
+        if (!logoutButton) {
+            return;
+        }
+
+        logoutButton.addEventListener("click", async function () {
+
+            logoutButton.disabled = true;
+            logoutButton.textContent = "로그아웃 중...";
+
+            try {
+                const response = await fetch("/api/user/logout", {
+                    method: "POST"
+                });
+
+                if (!response.ok) {
+                    throw new Error("로그아웃 요청 실패");
+                }
+
+                window.location.href = "/login";
+
+            } catch (error) {
+                console.error(error);
+
+                alert("로그아웃 처리 중 오류가 발생했습니다.");
+
+                logoutButton.disabled = false;
+                logoutButton.textContent = "로그아웃";
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -56,11 +56,10 @@ public class UserService {
             user.setFailCount(0);
             userRepository.save(user);
 
-            // 기존 로그인 아이디 저장
-            session.setAttribute("loggedInUser", loginId);
-
-            // 일정·통계 기능에서 사용할 숫자 사용자 번호 저장
+            // 로그인한 사용자 정보를 세션에 저장
+            session.setAttribute("loggedInUser", user.getLoginId());
             session.setAttribute("userId", user.getId());
+            session.setAttribute("userName", user.getName());
 
             return "로그인 성공";
 
@@ -70,7 +69,7 @@ public class UserService {
                     user.getFailCount() + 1
             );
 
-            // 5회 실패
+            // 5회 실패 시 계정 잠금
             if (user.getFailCount() >= 5) {
 
                 user.setLocked(true);
@@ -116,9 +115,10 @@ public class UserService {
 
             userRepository.save(user);
 
-            // 로그인 정보 저장
-            session.setAttribute("loggedInUser", loginId);
+            // 로그인한 사용자 정보를 세션에 저장
+            session.setAttribute("loggedInUser", user.getLoginId());
             session.setAttribute("userId", user.getId());
+            session.setAttribute("userName", user.getName());
 
             return "2차 비밀번호 인증 성공. 로그인되었습니다.";
 

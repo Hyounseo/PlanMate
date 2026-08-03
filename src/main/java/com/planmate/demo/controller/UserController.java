@@ -53,9 +53,9 @@ public class UserController {
     @PostMapping("/logout")
     public String logout(HttpSession session) {
 
-        // loggedInUser와 userId를 포함한 세션 전체 삭제
+        // 세션 전체 삭제
         session.invalidate();
 
-        return "로그아웃 되었습니다.";
+        return "로그아웃 성공";
     }
 }

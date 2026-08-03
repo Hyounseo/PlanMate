@@ -1,40 +1,136 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>공부시간 통계 - PlanMate</title>
-    <!-- 공통 레이아웃(Header/Sidebar/Footer)은 팀원4가 만들면 그 안에 이 내용만 옮겨 넣으면 됨 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PlanMate - 공부시간 통계</title>
+
+    <!-- 공통 레이아웃 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+
+    <!-- 통계 페이지 전용 스타일 -->
     <link rel="stylesheet" th:href="@{/css/statistics.css}">
+
+    <!-- 차트 라이브러리 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
-<div class="stats-container">
-    <h2>공부시간 통계</h2>
+<!-- 공통 Header -->
+<div th:replace="~{fragments/header :: header}"></div>
 
-    <!-- 요약 카드: 일별 / 주별 / 월별 -->
-    <div class="summary-cards">
-        <div class="card">
-            <p class="card-label">오늘</p>
-            <p class="card-value" id="dailyTotal">--</p>
-        </div>
-        <div class="card">
-            <p class="card-label">이번 주</p>
-            <p class="card-value" id="weeklyTotal">--</p>
-        </div>
-        <div class="card">
-            <p class="card-label">이번 달</p>
-            <p class="card-value" id="monthlyTotal">--</p>
-        </div>
-    </div>
+<!-- Sidebar + 본문 -->
+<div class="site-layout">
 
-    <!-- 과목별 통계 그래프 -->
-    <div class="chart-box">
-        <h3>이번 달 과목별 공부시간</h3>
-        <canvas id="subjectChart" height="120"></canvas>
-    </div>
+    <!-- 공통 Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- 통계 본문 -->
+    <main class="statistics-page">
+
+        <div class="statistics-page-header">
+            <div>
+                <p class="section-label">STATISTICS</p>
+
+                <h1>공부시간 통계</h1>
+
+                <p class="statistics-description">
+                    오늘, 이번 주, 이번 달의 공부시간과 과목별 학습 현황을 확인해보세요.
+                </p>
+            </div>
+        </div>
+
+        <!-- 요약 카드 -->
+        <section class="summary-cards">
+
+            <article class="statistics-summary-card">
+                <div class="summary-icon">☀️</div>
+
+                <div>
+                    <p class="card-label">TODAY</p>
+                    <h2>오늘 공부시간</h2>
+
+                    <p
+                            class="card-value"
+                            id="dailyTotal">
+                        --
+                    </p>
+                </div>
+            </article>
+
+            <article class="statistics-summary-card">
+                <div class="summary-icon">📅</div>
+
+                <div>
+                    <p class="card-label">WEEK</p>
+                    <h2>이번 주 공부시간</h2>
+
+                    <p
+                            class="card-value"
+                            id="weeklyTotal">
+                        --
+                    </p>
+                </div>
+            </article>
+
+            <article class="statistics-summary-card">
+                <div class="summary-icon">🗓️</div>
+
+                <div>
+                    <p class="card-label">MONTH</p>
+                    <h2>이번 달 공부시간</h2>
+
+                    <p
+                            class="card-value"
+                            id="monthlyTotal">
+                        --
+                    </p>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- 과목별 통계 차트 -->
+        <section class="chart-card">
+
+            <div class="chart-card-header">
+                <div>
+                    <p class="card-label">SUBJECT</p>
+                    <h2>이번 달 과목별 공부시간</h2>
+                </div>
+
+                <div class="chart-badge">
+                    월간 통계
+                </div>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="subjectChart"></canvas>
+            </div>
+
+            <p
+                    id="chartEmptyMessage"
+                    class="chart-empty-message">
+                공부 기록이 등록되면 과목별 통계가 표시됩니다.
+            </p>
+
+        </section>
+
+    </main>
+
 </div>
 
+<!-- 공통 Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- 통계 기능 -->
 <script th:src="@{/js/statistics.js}"></script>
+
+<!-- 로그아웃 기능 -->
+<script th:replace="~{fragments/header :: logoutScript}"></script>
+
 </body>
 </html>

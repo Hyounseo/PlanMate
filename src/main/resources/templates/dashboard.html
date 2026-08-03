@@ -12,146 +12,230 @@
 
 <body>
 
-<div class="dashboard-container">
+<!-- 공통 Header -->
+<div th:replace="~{fragments/header :: header}"></div>
 
-    <header class="dashboard-header">
-        <div>
-            <p class="header-label">PLANMATE</p>
-            <h1>나의 학습 대시보드</h1>
-            <p class="header-description">
-                오늘의 학습 현황을 확인하고 목표를 달성해보세요.
-            </p>
-        </div>
+<!-- Sidebar + 본문 -->
+<div class="site-layout">
 
-        <div class="profile">
-            <div class="profile-icon">👩‍💻</div>
+    <!-- 공통 Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
+    <!-- 대시보드 본문 -->
+    <div class="dashboard-container">
+
+        <header class="dashboard-header">
             <div>
-                <strong>다은님</strong>
-                <p>오늘도 파이팅!</p>
-            </div>
-        </div>
-    </header>
+                <p class="header-label">DASHBOARD</p>
+                <h1>나의 학습 대시보드</h1>
 
-    <main>
-
-        <!-- 상단 요약 카드 -->
-        <section class="summary-grid">
-
-            <article class="summary-card">
-                <div class="card-icon">⏱️</div>
-
-                <div>
-                    <p class="card-title">총 공부시간</p>
-                    <p class="card-value" id="totalStudyTime">0시간</p>
-                    <p class="card-caption">오늘의 누적 공부시간</p>
-                </div>
-            </article>
-
-            <article class="summary-card">
-                <div class="card-icon">📅</div>
-
-                <div>
-                    <p class="card-title">목표일까지</p>
-
-                    <p class="card-value">
-                        D-<span id="dday" th:text="${dDay}">0</span>
-                    </p>
-
-                    <p class="card-caption">목표일까지 남은 기간</p>
-                </div>
-            </article>
-
-            <article class="summary-card">
-                <div class="card-icon">🎯</div>
-
-                <div>
-                    <p class="card-title">목표 달성률</p>
-
-                    <p class="card-value">
-                        <span
-                                id="achievementRate"
-                                th:text="${achievementRate}">
-                            0
-                        </span>%
-                    </p>
-
-                    <p class="card-caption">오늘 목표 기준</p>
-                </div>
-            </article>
-
-        </section>
-
-        <!-- 목표 달성률 -->
-        <section class="content-card">
-
-            <div class="section-header">
-                <div>
-                    <p class="section-label">GOAL</p>
-                    <h2>오늘의 목표 달성률</h2>
-                </div>
-
-                <strong
-                        class="rate-text"
-                        th:text="|${achievementRate}%|">
-                    0%
-                </strong>
+                <p class="header-description">
+                    오늘의 학습 현황을 확인하고 목표를 달성해보세요.
+                </p>
             </div>
 
-            <div class="progress-background">
-                <div
-                        class="progress-bar"
-                        th:style="|width: ${achievementRate}%|">
+            <div class="profile">
+                <div class="profile-icon">👩‍💻</div>
+
+                <div>
+                    <!-- 현재는 임시 이름 -->
+                    <strong
+                            th:text="${session.userName != null}
+            ? |${session.userName}님|
+            : '사용자님'">
+                        사용자님
+                    </strong>
+                    <p>오늘도 파이팅!</p>
                 </div>
             </div>
+        </header>
 
-        </section>
+        <main>
 
-        <!-- 하단 -->
-        <section class="bottom-grid">
+            <!-- 상단 요약 카드 -->
+            <section class="summary-grid">
 
-            <article class="content-card">
+                <!-- 총 공부시간 -->
+                <article class="summary-card">
+                    <div class="card-icon">⏱️</div>
+
+                    <div>
+                        <p class="card-title">총 공부시간</p>
+
+                        <p class="card-value" id="totalStudyTime">
+                            <span th:text="${studyHours}">0</span>시간
+                            <span th:text="${studyMinutes}">0</span>분
+                        </p>
+
+                        <p class="card-caption">
+                            오늘의 누적 공부시간
+                        </p>
+                    </div>
+                </article>
+
+                <!-- D-Day -->
+                <article class="summary-card">
+                    <div class="card-icon">📅</div>
+
+                    <div>
+                        <p class="card-title">목표일까지</p>
+
+                        <p class="card-value">
+                            D-<span
+                                id="dday"
+                                th:text="${dDay}">
+                                0
+                            </span>
+                        </p>
+
+                        <p class="card-caption">
+                            목표일까지 남은 기간
+                        </p>
+                    </div>
+                </article>
+
+                <!-- 목표 달성률 -->
+                <article class="summary-card">
+                    <div class="card-icon">🎯</div>
+
+                    <div>
+                        <p class="card-title">목표 달성률</p>
+
+                        <p class="card-value">
+                            <span
+                                    id="achievementRate"
+                                    th:text="${achievementRate}">
+                                0
+                            </span>%
+                        </p>
+
+                        <p class="card-caption">
+                            오늘 목표 기준
+                        </p>
+                    </div>
+                </article>
+
+            </section>
+
+            <!-- 목표 달성률 -->
+            <section class="content-card">
 
                 <div class="section-header">
                     <div>
-                        <p class="section-label">SUBJECT</p>
-                        <h2>과목별 공부 비율</h2>
+                        <p class="section-label">GOAL</p>
+                        <h2>오늘의 목표 달성률</h2>
+                    </div>
+
+                    <strong
+                            class="rate-text"
+                            th:text="|${achievementRate}%|">
+                        0%
+                    </strong>
+                </div>
+
+                <div class="progress-background">
+                    <div
+                            class="progress-bar"
+                            th:style="|width: ${achievementRate > 100 ? 100 : achievementRate}%|">
                     </div>
                 </div>
 
-                <ul id="subjectRatio" class="subject-list">
+            </section>
 
-                    <li class="empty-message">
-                        공부 기록이 등록되면 표시됩니다.
-                    </li>
+            <!-- 하단 영역 -->
+            <section class="bottom-grid">
 
-                </ul>
+                <!-- 과목별 공부 비율 -->
+                <article class="content-card">
 
-            </article>
+                    <div class="section-header">
+                        <div>
+                            <p class="section-label">SUBJECT</p>
+                            <h2>과목별 공부 비율</h2>
+                        </div>
+                    </div>
 
-            <article class="recommendation-card">
+                    <ul id="subjectRatio" class="subject-list">
 
-                <div class="recommendation-icon">✨</div>
+                        <!-- 공부 기록이 없을 때 -->
+                        <li
+                                class="empty-message"
+                                th:if="${#lists.isEmpty(subjectRatios)}">
+                            공부 기록이 등록되면 표시됩니다.
+                        </li>
 
-                <div>
-                    <p class="section-label">AI RECOMMENDATION</p>
-                    <h2>오늘의 학습 추천</h2>
+                        <!-- 과목별 공부 비율 -->
+                        <li
+                                class="subject-item"
+                                th:each="subject : ${subjectRatios}">
 
-                    <p
-                            id="recommendation"
-                            class="recommendation-text"
-                            th:text="${recommendation}">
-                        추천 결과가 없습니다.
-                    </p>
-                </div>
+                            <div class="subject-info">
+                                <div class="subject-name-wrap">
 
-            </article>
+                                    <span
+                                            class="subject-color"
+                                            th:style="|background-color: ${subject.color};|">
+                                    </span>
 
-        </section>
+                                    <strong th:text="${subject.subjectName}">
+                                        자료구조
+                                    </strong>
 
-    </main>
+                                </div>
+
+                                <span th:text="|${subject.ratio}%|">
+                                    0%
+                                </span>
+                            </div>
+
+                            <div class="subject-progress-background">
+                                <div
+                                        class="subject-progress-bar"
+                                        th:style="|width: ${subject.ratio}%; background-color: ${subject.color};|">
+                                </div>
+                            </div>
+
+                        </li>
+
+                    </ul>
+
+                </article>
+
+                <!-- 추천 -->
+                <article class="recommendation-card">
+
+                    <div class="recommendation-icon">
+                        ✨
+                    </div>
+
+                    <div>
+                        <p class="section-label">
+                            AI RECOMMENDATION
+                        </p>
+
+                        <h2>오늘의 학습 추천</h2>
+
+                        <p
+                                id="recommendation"
+                                class="recommendation-text"
+                                th:text="${recommendation}">
+                            추천 결과가 없습니다.
+                        </p>
+                    </div>
+
+                </article>
+
+            </section>
+
+        </main>
+
+    </div>
 
 </div>
 
+<!-- 공통 Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script th:replace="~{fragments/header :: logoutScript}"></script>
 </body>
 </html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PlanMate - 계정 잠금 해제</title>
+
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+
+<body>
+
+<div class="auth-page">
+
+    <section class="auth-visual">
+
+        <div class="brand">
+            <div class="brand-icon">📘</div>
+            <span>PlanMate</span>
+        </div>
+
+        <div class="visual-content">
+            <p class="visual-label">ACCOUNT RECOVERY</p>
+
+            <h1>
+                잠긴 계정을 해제하고<br>
+                다시 학습을 시작하세요.
+            </h1>
+
+            <p>
+                회원가입 시 설정한 2차 비밀번호로<br>
+                안전하게 계정 잠금을 해제할 수 있습니다.
+            </p>
+        </div>
+
+        <div class="visual-card">
+            <span>보안 안내</span>
+            <strong>2차 비밀번호는 계정 잠금 해제에 사용됩니다.</strong>
+        </div>
+
+    </section>
+
+    <section class="auth-form-section">
+
+        <div class="auth-card">
+
+            <div class="mobile-brand">
+                📘 PlanMate
+            </div>
+
+            <div class="auth-header">
+                <p class="auth-label">UNLOCK ACCOUNT</p>
+
+                <h2>계정 잠금 해제</h2>
+
+                <p>
+                    아이디와 2차 비밀번호를 입력해주세요.
+                </p>
+            </div>
+
+            <form id="unlockForm">
+
+                <div class="form-group">
+                    <label for="loginId">아이디</label>
+
+                    <input
+                            type="text"
+                            id="loginId"
+                            name="loginId"
+                            placeholder="아이디를 입력하세요"
+                            autocomplete="username"
+                            required>
+                </div>
+
+                <div class="form-group">
+                    <label for="secondPassword">2차 비밀번호</label>
+
+                    <input
+                            type="password"
+                            id="secondPassword"
+                            name="secondPassword"
+                            placeholder="2차 비밀번호를 입력하세요"
+                            autocomplete="current-password"
+                            required>
+
+                    <p class="input-help">
+                        회원가입할 때 설정한 잠금 해제용 비밀번호입니다.
+                    </p>
+                </div>
+
+                <p
+                        id="unlockMessage"
+                        class="form-message">
+                </p>
+
+                <button
+                        type="submit"
+                        class="auth-submit-button"
+                        id="unlockButton">
+                    인증하고 로그인
+                </button>
+
+            </form>
+
+            <div class="auth-links">
+
+                <a th:href="@{/login}">
+                    로그인 화면으로 돌아가기
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+<script>
+    const unlockForm = document.getElementById("unlockForm");
+    const unlockButton = document.getElementById("unlockButton");
+    const unlockMessage = document.getElementById("unlockMessage");
+
+    unlockForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const loginId =
+            document.getElementById("loginId").value.trim();
+
+        const secondPassword =
+            document.getElementById("secondPassword").value;
+
+        unlockMessage.textContent = "";
+        unlockMessage.className = "form-message";
+
+        unlockButton.disabled = true;
+        unlockButton.textContent = "인증 중...";
+
+        const body = new URLSearchParams();
+
+        body.append("loginId", loginId);
+        body.append("secondPassword", secondPassword);
+
+        try {
+            const response = await fetch("/api/user/unlock", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: body.toString()
+            });
+
+            const result = await response.text();
+
+            if (
+                result.includes("잠금 해제") ||
+                result.includes("로그인 성공") ||
+                result.includes("성공")
+            ) {
+                unlockMessage.textContent =
+                    "계정 잠금이 해제되었습니다. 대시보드로 이동합니다.";
+
+                unlockMessage.classList.add("success-message");
+
+                setTimeout(function () {
+                    window.location.href = "/dashboard";
+                }, 1000);
+
+                return;
+            }
+
+            unlockMessage.textContent = result;
+            unlockMessage.classList.add("error-message");
+
+        } catch (error) {
+            console.error(error);
+
+            unlockMessage.textContent =
+                "서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.";
+
+            unlockMessage.classList.add("error-message");
+
+        } finally {
+            unlockButton.disabled = false;
+            unlockButton.textContent = "인증하고 로그인";
+        }
+    });
+</script>
+
+</body>
+</html>

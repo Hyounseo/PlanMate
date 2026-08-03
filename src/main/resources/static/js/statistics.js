@@ -1,77 +1,249 @@
-// 초(seconds)를 "N시간 M분" 형태로 변환
+let subjectChart = null;
+
 function formatSeconds(totalSeconds) {
-    if (totalSeconds == null) return '--';
+    if (totalSeconds == null) {
+        return "0시간 0분";
+    }
+
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
+
     return `${hours}시간 ${minutes}분`;
 }
 
+function toLocalISODate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+}
+
 function todayISO() {
-    return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    return toLocalISODate(new Date());
 }
 
 function firstDayOfMonthISO() {
     const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+
+    return toLocalISODate(
+        new Date(now.getFullYear(), now.getMonth(), 1)
+    );
 }
 
 function lastDayOfMonthISO() {
     const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+
+    return toLocalISODate(
+        new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    );
 }
 
-// 요약 카드(일/주/월) 채우기
+async function fetchJson(url) {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || "요청에 실패했습니다.");
+    }
+
+    return response.json();
+}
+
 async function loadSummaryCards() {
     const date = todayISO();
 
-    const [daily, weekly, monthly] = await Promise.all([
-        fetch(`/api/statistics/daily?date=${date}`).then(r => r.json()),
-        fetch(`/api/statistics/weekly?date=${date}`).then(r => r.json()),
-        fetch(`/api/statistics/monthly?date=${date}`).then(r => r.json())
-    ]);
+    const dailyElement = document.getElementById("dailyTotal");
+    const weeklyElement = document.getElementById("weeklyTotal");
+    const monthlyElement = document.getElementById("monthlyTotal");
 
-    document.getElementById('dailyTotal').textContent = formatSeconds(daily.totalSeconds);
-    document.getElementById('weeklyTotal').textContent = formatSeconds(weekly.totalSeconds);
-    document.getElementById('monthlyTotal').textContent = formatSeconds(monthly.totalSeconds);
+    try {
+        const [daily, weekly, monthly] = await Promise.all([
+            fetchJson(
+                `/api/statistics/daily?date=${encodeURIComponent(date)}`
+            ),
+            fetchJson(
+                `/api/statistics/weekly?date=${encodeURIComponent(date)}`
+            ),
+            fetchJson(
+                `/api/statistics/monthly?date=${encodeURIComponent(date)}`
+            )
+        ]);
+
+        dailyElement.textContent =
+            formatSeconds(daily.totalSeconds);
+
+        weeklyElement.textContent =
+            formatSeconds(weekly.totalSeconds);
+
+        monthlyElement.textContent =
+            formatSeconds(monthly.totalSeconds);
+
+    } catch (error) {
+        console.error(error);
+
+        dailyElement.textContent = "불러오기 실패";
+        weeklyElement.textContent = "불러오기 실패";
+        monthlyElement.textContent = "불러오기 실패";
+    }
 }
 
-// 과목별 통계 -> Chart.js 막대그래프
 async function loadSubjectChart() {
     const startDate = firstDayOfMonthISO();
     const endDate = lastDayOfMonthISO();
 
-    const data = await fetch(`/api/statistics/by-subject?startDate=${startDate}&endDate=${endDate}`)
-        .then(r => r.json());
-    // data 형태: { "1": 3600, "2": 7200 } (subjectId -> 초)
+    const chartCanvas =
+        document.getElementById("subjectChart");
 
-    // TODO: 팀원2(Subject) API 연동되면 subjectId -> 과목명으로 교체
-    const labels = Object.keys(data).map(id => `과목 ${id}`);
-    const seconds = Object.values(data);
-    const hours = seconds.map(s => Math.round((s / 3600) * 10) / 10); // 그래프는 시간 단위로 보여줌
+    const emptyMessage =
+        document.getElementById("chartEmptyMessage");
 
-    new Chart(document.getElementById('subjectChart'), {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: '공부시간(시간)',
-                data: hours,
-                backgroundColor: '#7C9EFF'
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: { display: true, text: '시간' }
+    try {
+        const [subjectStatistics, subjects] =
+            await Promise.all([
+                fetchJson(
+                    `/api/statistics/by-subject`
+                    + `?startDate=${encodeURIComponent(startDate)}`
+                    + `&endDate=${encodeURIComponent(endDate)}`
+                ),
+                fetchJson("/api/subjects")
+            ]);
+
+        const subjectNameMap = new Map();
+
+        subjects.forEach(subject => {
+            subjectNameMap.set(
+                String(subject.subjectId),
+                subject.subjectName
+            );
+        });
+
+        const subjectEntries =
+            Object.entries(subjectStatistics)
+                .filter(([, totalSeconds]) =>
+                    Number(totalSeconds) > 0
+                )
+                .sort((a, b) =>
+                    Number(b[1]) - Number(a[1])
+                );
+
+        if (subjectEntries.length === 0) {
+            chartCanvas.style.display = "none";
+            emptyMessage.style.display = "block";
+
+            if (subjectChart) {
+                subjectChart.destroy();
+                subjectChart = null;
+            }
+
+            return;
+        }
+
+        chartCanvas.style.display = "block";
+        emptyMessage.style.display = "none";
+
+        const labels = subjectEntries.map(([subjectId]) =>
+            subjectNameMap.get(String(subjectId))
+            ?? `과목 ${subjectId}`
+        );
+
+        const hours = subjectEntries.map(([, totalSeconds]) =>
+            Math.round(
+                (Number(totalSeconds) / 3600) * 10
+            ) / 10
+        );
+
+        if (subjectChart) {
+            subjectChart.destroy();
+        }
+
+        subjectChart = new Chart(chartCanvas, {
+            type: "bar",
+
+            data: {
+                labels: labels,
+
+                datasets: [
+                    {
+                        label: "공부시간(시간)",
+                        data: hours,
+                        backgroundColor:
+                            "rgba(108, 99, 255, 0.72)",
+                        borderColor:
+                            "rgba(108, 99, 255, 1)",
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        maxBarThickness: 58
+                    }
+                ]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                return `${context.raw}시간`;
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+
+                        ticks: {
+                            color: "#667487"
+                        }
+                    },
+
+                    y: {
+                        beginAtZero: true,
+
+                        grid: {
+                            color: "#edf0f4"
+                        },
+
+                        ticks: {
+                            color: "#667487"
+                        },
+
+                        title: {
+                            display: true,
+                            text: "시간",
+                            color: "#667487"
+                        }
+                    }
                 }
             }
-        }
-    });
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        chartCanvas.style.display = "none";
+        emptyMessage.style.display = "block";
+        emptyMessage.textContent =
+            "통계 데이터를 불러오지 못했습니다.";
+    }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadSummaryCards();
-    loadSubjectChart();
-});
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
+        await Promise.all([
+            loadSummaryCards(),
+            loadSubjectChart()
+        ]);
+    }
+);

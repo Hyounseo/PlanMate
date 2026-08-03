@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<aside th:fragment="sidebar" class="sidebar">
+
+    <div class="sidebar-title">
+        MENU
+    </div>
+
+    <nav>
+        <ul class="sidebar-menu">
+
+            <li>
+                <a th:href="@{/dashboard}">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/schedule}">
+                    📅 Schedule
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/study/record}">
+                    ⏱️ Study Record
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/study/statistics}">
+                    📊 Statistics
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/goal}">
+                    🎯 Goal
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+
+</aside>
+
+</body>
+</html>
