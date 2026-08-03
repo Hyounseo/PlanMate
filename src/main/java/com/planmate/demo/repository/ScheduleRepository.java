@@ -24,5 +24,16 @@ public interface ScheduleRepository
             Long userId
     );
 
-    void deleteBySubjectIdAndUserId(Long subjectId, Long userId);
+    // 오늘부터 가장 가까운 일정 3개 조회
+    List<Schedule>
+    findTop3ByUserIdAndScheduleDateGreaterThanEqualOrderByScheduleDateAscStartTimeAsc(
+            Long userId,
+            LocalDate scheduleDate
+    );
+
+    // 과목 삭제 시 관련 일정 삭제
+    void deleteBySubjectIdAndUserId(
+            Long subjectId,
+            Long userId
+    );
 }

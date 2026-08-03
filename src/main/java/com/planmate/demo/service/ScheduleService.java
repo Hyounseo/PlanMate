@@ -38,18 +38,44 @@ public class ScheduleService {
                 );
     }
 
+    /*
+     * Dashboard용
+     * 오늘 이후 가장 가까운 일정 3개 조회
+     */
+    public List<Schedule> getUpcomingSchedules(Long userId) {
+
+        if (userId == null) {
+            return List.of();
+        }
+
+        return scheduleRepository
+                .findTop3ByUserIdAndScheduleDateGreaterThanEqualOrderByScheduleDateAscStartTimeAsc(
+                        userId,
+                        LocalDate.now()
+                );
+    }
+
     // 새 일정 등록
     @Transactional
-    public Schedule createSchedule(Long userId, Schedule request) {
+    public Schedule createSchedule(
+            Long userId,
+            Schedule request
+    ) {
 
         // 해당 사용자에게 실제로 존재하는 과목인지 확인
-        validateSubject(request.getSubjectId(), userId);
+        validateSubject(
+                request.getSubjectId(),
+                userId
+        );
 
         request.setScheduleId(null);
         request.setUserId(userId);
 
-        // 완료 상태를 입력하지 않은 경우 기본값 설정
-        if (request.getStatus() == null || request.getStatus().isBlank()) {
+        // 상태를 입력하지 않은 경우 기본값 설정
+        if (
+                request.getStatus() == null
+                        || request.getStatus().isBlank()
+        ) {
             request.setStatus("PLANNED");
         }
 
@@ -63,25 +89,57 @@ public class ScheduleService {
             Long userId,
             Schedule request
     ) {
-        Schedule schedule = scheduleRepository
-                .findByScheduleIdAndUserId(scheduleId, userId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("일정을 찾을 수 없습니다.")
-                );
 
-        validateSubject(request.getSubjectId(), userId);
+        Schedule schedule =
+                scheduleRepository
+                        .findByScheduleIdAndUserId(
+                                scheduleId,
+                                userId
+                        )
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "일정을 찾을 수 없습니다."
+                                )
+                        );
 
-        schedule.setSubjectId(request.getSubjectId());
-        schedule.setTitle(request.getTitle());
-        schedule.setScheduleDate(request.getScheduleDate());
-        schedule.setStartTime(request.getStartTime());
-        schedule.setEndTime(request.getEndTime());
-        schedule.setMemo(request.getMemo());
+        validateSubject(
+                request.getSubjectId(),
+                userId
+        );
 
-        if (request.getStatus() == null || request.getStatus().isBlank()) {
+        schedule.setSubjectId(
+                request.getSubjectId()
+        );
+
+        schedule.setTitle(
+                request.getTitle()
+        );
+
+        schedule.setScheduleDate(
+                request.getScheduleDate()
+        );
+
+        schedule.setStartTime(
+                request.getStartTime()
+        );
+
+        schedule.setEndTime(
+                request.getEndTime()
+        );
+
+        schedule.setMemo(
+                request.getMemo()
+        );
+
+        if (
+                request.getStatus() == null
+                        || request.getStatus().isBlank()
+        ) {
             schedule.setStatus("PLANNED");
         } else {
-            schedule.setStatus(request.getStatus());
+            schedule.setStatus(
+                    request.getStatus()
+            );
         }
 
         return scheduleRepository.save(schedule);
@@ -89,26 +147,47 @@ public class ScheduleService {
 
     // 일정 삭제
     @Transactional
-    public void deleteSchedule(Long scheduleId, Long userId) {
-        Schedule schedule = scheduleRepository
-                .findByScheduleIdAndUserId(scheduleId, userId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("일정을 찾을 수 없습니다.")
-                );
+    public void deleteSchedule(
+            Long scheduleId,
+            Long userId
+    ) {
+
+        Schedule schedule =
+                scheduleRepository
+                        .findByScheduleIdAndUserId(
+                                scheduleId,
+                                userId
+                        )
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "일정을 찾을 수 없습니다."
+                                )
+                        );
 
         scheduleRepository.delete(schedule);
     }
 
     // 선택한 과목이 현재 사용자의 과목인지 확인
-    private void validateSubject(Long subjectId, Long userId) {
+    private void validateSubject(
+            Long subjectId,
+            Long userId
+    ) {
+
         if (subjectId == null) {
-            throw new IllegalArgumentException("과목을 선택해야 합니다.");
+            throw new IllegalArgumentException(
+                    "과목을 선택해야 합니다."
+            );
         }
 
         subjectRepository
-                .findBySubjectIdAndUserId(subjectId, userId)
+                .findBySubjectIdAndUserId(
+                        subjectId,
+                        userId
+                )
                 .orElseThrow(() ->
-                        new IllegalArgumentException("과목을 찾을 수 없습니다.")
+                        new IllegalArgumentException(
+                                "과목을 찾을 수 없습니다."
+                        )
                 );
     }
 }

@@ -552,3 +552,297 @@ body {
         flex-direction: column;
     }
 }
+
+.goal-summary {
+    margin: 2px 0 20px;
+}
+
+.goal-title-box {
+    margin-bottom: 13px;
+}
+
+.goal-label {
+    color: #98a3b2;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.goal-title {
+    margin-top: 6px;
+    color: #2f3c4f;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.goal-time {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    color: #738195;
+    font-size: 14px;
+}
+
+.goal-time strong {
+    color: #34465b;
+    font-weight: 800;
+}
+
+.goal-divider {
+    color: #c7ced8;
+}
+
+.empty-goal-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    color: #8793a3;
+    font-size: 14px;
+}
+
+.goal-register-link {
+    flex-shrink: 0;
+    color: #6c63ff;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.goal-register-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .empty-goal-summary {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* =========================
+   Goal summary
+========================= */
+
+.goal-summary {
+    margin: 2px 0 20px;
+}
+
+.goal-title-box {
+    margin-bottom: 13px;
+}
+
+.goal-label {
+    color: #98a3b2;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.goal-title {
+    margin-top: 6px;
+    color: #2f3c4f;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.goal-time {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    color: #738195;
+    font-size: 14px;
+}
+
+.goal-time strong {
+    color: #34465b;
+    font-weight: 800;
+}
+
+.goal-divider {
+    color: #c7ced8;
+}
+
+.empty-goal-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    color: #8793a3;
+    font-size: 14px;
+}
+
+.goal-register-link {
+    flex-shrink: 0;
+    color: #6c63ff;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.goal-register-link:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================
+   Upcoming schedules
+========================= */
+
+.upcoming-section {
+    margin-top: 24px;
+}
+
+.view-all-link {
+    color: #6c63ff;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.view-all-link:hover {
+    opacity: 0.7;
+}
+
+.upcoming-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.upcoming-item {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 16px;
+    padding: 18px;
+    background: #ffffff;
+    border: 1px solid #e7ebf2;
+    border-radius: 14px;
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+}
+
+.upcoming-item:hover {
+    transform: translateY(-3px);
+    border-color: #d9d5ff;
+    box-shadow: 0 12px 28px rgba(38, 57, 83, 0.09);
+}
+
+.d-day-box {
+    display: flex;
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #e5e9f0;
+    border-radius: 13px;
+    color: #ef3d4f;
+    font-size: 19px;
+    font-weight: 900;
+}
+
+.schedule-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.schedule-title-row {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+}
+
+.schedule-title-row strong {
+    overflow: hidden;
+    color: #2f3c4f;
+    font-size: 15px;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.schedule-info p {
+    margin-top: 8px;
+    color: #8793a3;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.schedule-badge {
+    flex-shrink: 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.schedule-badge.assignment {
+    background: #fff0e4;
+    color: #f17c2f;
+}
+
+.schedule-badge.exam {
+    background: #ffe9ed;
+    color: #e84d63;
+}
+
+.schedule-badge.team {
+    background: #eee9ff;
+    color: #7d5be7;
+}
+
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1100px) {
+    .upcoming-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .empty-goal-summary {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .upcoming-item {
+        align-items: flex-start;
+    }
+
+    .d-day-box {
+        width: 52px;
+        height: 52px;
+        font-size: 17px;
+    }
+
+    .schedule-title-row {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+}
+
+.empty-upcoming-message {
+    grid-column: 1 / -1;
+    padding: 34px 20px;
+    background: #f8f9fc;
+    border: 1px dashed #dfe4ec;
+    border-radius: 14px;
+    color: #98a3b2;
+    font-size: 14px;
+    text-align: center;
+}

@@ -295,18 +295,26 @@ button:hover {
 }
 
 .schedule-item {
+
     margin-top: 7px;
+
     padding: 7px 8px;
-    overflow: hidden;
+
     background: #efedff;
+
     border-left: 4px solid #6c63ff;
+
     border-radius: 7px;
-    color: #5149c8;
-    font-size: 12px;
-    line-height: 1.3;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+
     cursor: pointer;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+
+    overflow: hidden;
 }
 
 .schedule-item:hover {
@@ -391,4 +399,79 @@ button:hover {
     .button-row button {
         flex: 1;
     }
+}
+
+.schedule-time {
+
+    font-size: 11px;
+
+    color: #7B8794;
+
+    font-weight: 600;
+
+    line-height: 1;
+}
+
+.schedule-title {
+
+    width: 100%;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    color: #5149c8;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+/* 오늘 날짜 */
+.date-cell.today {
+    background: #fff8df;
+    box-shadow: inset 0 0 0 1px #f0d66d;
+}
+
+/* 오늘 날짜 숫자 */
+.date-cell.today .date-number {
+    display: inline-flex;
+    width: 27px;
+    height: 27px;
+    align-items: center;
+    justify-content: center;
+    background: #f2cc58;
+    border-radius: 50%;
+    color: #ffffff;
+    font-weight: 800;
+}
+
+/* 선택한 날짜 */
+.date-cell.selected-date {
+    background: #f3f0ff;
+    box-shadow:
+            inset 0 0 0 2px #7469ee,
+            0 0 0 3px rgba(108, 99, 255, 0.08);
+}
+
+/* 오늘이면서 선택된 날짜 */
+.date-cell.today.selected-date {
+    background: #f3f0ff;
+    box-shadow:
+            inset 0 0 0 2px #7469ee,
+            0 0 0 3px rgba(108, 99, 255, 0.1);
+}
+
+/* 날짜 셀 마우스 효과 */
+.date-cell:not(.empty) {
+    cursor: pointer;
+    transition:
+            background 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.date-cell:not(.empty):hover {
+    background: #f8f7ff;
 }

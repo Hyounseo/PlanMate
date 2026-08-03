@@ -3,12 +3,21 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-  <title>PlanMate - 일정관리</title>
+  <title>PlanMate - 일정 관리</title>
 
-  <link rel="stylesheet" th:href="@{/css/dashboard.css}">
-  <link rel="stylesheet" th:href="@{/css/schedule.css}">
+  <!-- 공통 레이아웃 CSS -->
+  <link
+          rel="stylesheet"
+          th:href="@{/css/dashboard.css}">
+
+  <!-- 일정 관리 전용 CSS -->
+  <link
+          rel="stylesheet"
+          th:href="@{/css/schedule.css}">
 </head>
 
 <body>
@@ -22,18 +31,22 @@
   <!-- 공통 Sidebar -->
   <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-  <!-- 일정관리 본문 -->
-  <main class="page">
+  <!-- 일정 관리 본문 -->
+  <main class="page schedule-page">
 
     <!-- 페이지 제목 -->
-    <div class="page-title">
+    <header class="page-title">
 
       <div>
-        <p class="section-label">SCHEDULE</p>
+        <p class="section-label">
+          SCHEDULE
+        </p>
 
-        <h2>공부 일정 관리</h2>
+        <h2>
+          공부 일정 관리
+        </h2>
 
-        <p>
+        <p class="page-description">
           과목과 공부 일정을 등록하고
           캘린더에서 확인할 수 있습니다.
         </p>
@@ -46,7 +59,7 @@
         + 일정 등록
       </button>
 
-    </div>
+    </header>
 
     <!-- 과목 관리 / 캘린더 / 일정 폼 -->
     <div class="schedule-layout">
@@ -54,29 +67,47 @@
       <!-- 과목 관리 -->
       <section class="card subject-panel">
 
-        <h3>과목 관리</h3>
+        <div class="panel-header">
+          <h3>
+            과목 관리
+          </h3>
+        </div>
 
-        <ul id="subjectList" class="subject-list"></ul>
+        <!-- JS로 과목 목록 출력 -->
+        <ul
+                id="subjectList"
+                class="subject-list">
+        </ul>
 
+        <!-- 과목 등록·수정 폼 -->
         <div class="subject-form">
 
-          <label for="subjectName">
-            과목명
-          </label>
+          <div class="form-group">
 
-          <input
-                  id="subjectName"
-                  type="text"
-                  placeholder="과목명을 입력하세요">
+            <label for="subjectName">
+              과목명
+            </label>
 
-          <label for="subjectColor">
-            과목 색상
-          </label>
+            <input
+                    id="subjectName"
+                    type="text"
+                    placeholder="과목명을 입력하세요"
+                    autocomplete="off">
 
-          <input
-                  id="subjectColor"
-                  type="color"
-                  value="#6b7280">
+          </div>
+
+          <div class="form-group">
+
+            <label for="subjectColor">
+              과목 색상
+            </label>
+
+            <input
+                    id="subjectColor"
+                    type="color"
+                    value="#6b7280">
+
+          </div>
 
           <div class="button-row">
 
@@ -89,7 +120,8 @@
 
             <button
                     type="button"
-                    id="updateSubjectBtn">
+                    id="updateSubjectBtn"
+                    class="secondary-button">
               수정
             </button>
 
@@ -113,17 +145,21 @@
 
           <button
                   type="button"
-                  id="prevMonthBtn">
+                  id="prevMonthBtn"
+                  class="calendar-navigation-button"
+                  aria-label="이전 달">
             &lt;
           </button>
 
           <h3 id="calendarTitle">
-            2026년 7월
+            2026년 8월
           </h3>
 
           <button
                   type="button"
-                  id="nextMonthBtn">
+                  id="nextMonthBtn"
+                  class="calendar-navigation-button"
+                  aria-label="다음 달">
             &gt;
           </button>
 
@@ -131,158 +167,49 @@
 
         <!-- 요일 -->
         <div class="calendar-grid weekday">
-          <div>일</div>
-          <div>월</div>
-          <div>화</div>
-          <div>수</div>
-          <div>목</div>
-          <div>금</div>
-          <div>토</div>
+
+          <div class="sunday">
+            일
+          </div>
+
+          <div>
+            월
+          </div>
+
+          <div>
+            화
+          </div>
+
+          <div>
+            수
+          </div>
+
+          <div>
+            목
+          </div>
+
+          <div>
+            금
+          </div>
+
+          <div class="saturday">
+            토
+          </div>
+
         </div>
 
-        <!-- 날짜 영역 -->
+        <!--
+            schedule.js에서 날짜와 일정을 생성함.
+            일정 HTML 권장 구조:
+
+            <button class="schedule-item" title="전체 일정 제목">
+                <span class="schedule-item-time">11:30</span>
+                <span class="schedule-item-title">자바 강의</span>
+            </button>
+        -->
         <div
                 id="calendarDates"
                 class="calendar-grid dates">
-
-          <div class="empty"></div>
-          <div class="empty"></div>
-          <div class="empty"></div>
-
-          <div>
-            <span>1</span>
-          </div>
-
-          <div>
-            <span>2</span>
-          </div>
-
-          <div>
-            <span>3</span>
-          </div>
-
-          <div>
-            <span>4</span>
-          </div>
-
-          <div>
-            <span>5</span>
-          </div>
-
-          <div>
-            <span>6</span>
-
-            <p class="schedule-item">
-              영어 단어 암기
-            </p>
-          </div>
-
-          <div>
-            <span>7</span>
-          </div>
-
-          <div>
-            <span>8</span>
-          </div>
-
-          <div>
-            <span>9</span>
-          </div>
-
-          <div>
-            <span>10</span>
-          </div>
-
-          <div>
-            <span>11</span>
-          </div>
-
-          <div>
-            <span>12</span>
-          </div>
-
-          <div>
-            <span>13</span>
-          </div>
-
-          <div>
-            <span>14</span>
-
-            <p class="schedule-item">
-              자바 강의
-            </p>
-          </div>
-
-          <div>
-            <span>15</span>
-          </div>
-
-          <div>
-            <span>16</span>
-          </div>
-
-          <div>
-            <span>17</span>
-          </div>
-
-          <div>
-            <span>18</span>
-          </div>
-
-          <div>
-            <span>19</span>
-          </div>
-
-          <div>
-            <span>20</span>
-          </div>
-
-          <div>
-            <span>21</span>
-          </div>
-
-          <div>
-            <span>22</span>
-          </div>
-
-          <div>
-            <span>23</span>
-          </div>
-
-          <div>
-            <span>24</span>
-          </div>
-
-          <div>
-            <span>25</span>
-          </div>
-
-          <div>
-            <span>26</span>
-          </div>
-
-          <div>
-            <span>27</span>
-          </div>
-
-          <div>
-            <span>28</span>
-          </div>
-
-          <div>
-            <span>29</span>
-          </div>
-
-          <div>
-            <span>30</span>
-          </div>
-
-          <div>
-            <span>31</span>
-          </div>
-
-          <div class="empty"></div>
-
         </div>
 
       </section>
@@ -290,72 +217,120 @@
       <!-- 일정 등록·수정 폼 -->
       <section class="card schedule-form-panel">
 
-        <h3>일정 등록 / 수정</h3>
+        <div class="panel-header">
 
-        <form id="scheduleForm">
+          <h3 id="scheduleFormTitle">
+            일정 등록 / 수정
+          </h3>
 
-          <label for="subject">
-            과목
-          </label>
+        </div>
 
-          <select id="subject"></select>
+        <form
+                id="scheduleForm"
+                autocomplete="off">
 
-          <label for="title">
-            일정 제목
-          </label>
+          <div class="form-group">
 
-          <input
-                  id="title"
-                  type="text"
-                  placeholder="예: 영어 단어 암기">
+            <label for="subject">
+              과목
+            </label>
 
-          <label for="date">
-            날짜
-          </label>
+            <select id="subject">
+              <option value="">
+                과목을 선택하세요
+              </option>
+            </select>
 
-          <input
-                  id="date"
-                  type="date">
+          </div>
 
-          <label for="startTime">
-            시작 시간
-          </label>
+          <div class="form-group">
 
-          <input
-                  id="startTime"
-                  type="time">
+            <label for="title">
+              일정 제목
+            </label>
 
-          <label for="endTime">
-            종료 시간
-          </label>
+            <input
+                    id="title"
+                    type="text"
+                    maxlength="100"
+                    placeholder="예: 영어 단어 암기">
 
-          <input
-                  id="endTime"
-                  type="time">
+          </div>
 
-          <label for="memo">
-            메모
-          </label>
+          <div class="form-group">
 
-          <textarea
-                  id="memo"
-                  placeholder="메모를 입력하세요"></textarea>
+            <label for="date">
+              날짜
+            </label>
 
-          <label for="status">
-            상태
-          </label>
+            <input
+                    id="date"
+                    type="date">
 
-          <select id="status">
-            <option value="예정">
-              예정
-            </option>
+          </div>
 
-            <option value="완료">
-              완료
-            </option>
-          </select>
+          <div class="time-input-row">
 
-          <div class="button-row">
+            <div class="form-group">
+
+              <label for="startTime">
+                시작 시간
+              </label>
+
+              <input
+                      id="startTime"
+                      type="time">
+
+            </div>
+
+            <div class="form-group">
+
+              <label for="endTime">
+                종료 시간
+              </label>
+
+              <input
+                      id="endTime"
+                      type="time">
+
+            </div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="memo">
+              메모
+            </label>
+
+            <textarea
+                    id="memo"
+                    maxlength="500"
+                    placeholder="메모를 입력하세요"></textarea>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="status">
+              상태
+            </label>
+
+            <select id="status">
+
+              <option value="예정">
+                예정
+              </option>
+
+              <option value="완료">
+                완료
+              </option>
+
+            </select>
+
+          </div>
+
+          <div class="button-row schedule-button-row">
 
             <button
                     type="button"
@@ -366,7 +341,8 @@
 
             <button
                     type="button"
-                    id="updateScheduleBtn">
+                    id="updateScheduleBtn"
+                    class="secondary-button">
               수정
             </button>
 
@@ -392,7 +368,13 @@
 <!-- 공통 Footer -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 
+<!-- 일정 관리 기능 -->
 <script th:src="@{/js/schedule.js}"></script>
+
+<!-- 로그아웃 기능 -->
 <script th:replace="~{fragments/header :: logoutScript}"></script>
+
 </body>
 </html>
+
+
