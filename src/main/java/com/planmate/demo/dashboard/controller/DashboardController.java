@@ -33,11 +33,16 @@ public class DashboardController {
             HttpSession session
     ) {
 
-        // 로그인한 사용자 번호 가져오기
+        /*
+         * 로그인한 사용자 번호 가져오기
+         */
         Long userId =
                 (Long) session.getAttribute("userId");
 
-        // 로그인하지 않은 사용자는 로그인 화면으로 이동
+        /*
+         * 로그인하지 않은 사용자는
+         * 로그인 화면으로 이동
+         */
         if (userId == null) {
             return "redirect:/login";
         }
@@ -70,7 +75,8 @@ public class DashboardController {
                         .getUpcomingSchedules(userId);
 
         /*
-         * 로그인한 사용자의 가장 가까운 목표 조회
+         * 로그인한 사용자의
+         * 가장 가까운 목표 조회
          */
         Optional<StudyGoal> goalOptional =
                 dashboardService
@@ -131,21 +137,28 @@ public class DashboardController {
         }
 
         /*
-         * 달성률 기반 추천 문구
+         * Dashboard 접속 시에는
+         * Gemini를 호출하지 않는다.
+         *
+         * 실제 AI 추천 생성은
+         * 사용자가 버튼을 눌렀을 때
+         * /api/ai/recommendation에서 처리한다.
          */
         String recommendation;
 
         if (!hasGoal) {
+
             recommendation =
-                    "🎯 학습 목표를 등록하면 "
-                            + "목표 달성률과 맞춤 추천을 "
-                            + "확인할 수 있습니다.";
+                    "학습 목표를 등록하면 "
+                            + "AI 맞춤 학습 전략을 "
+                            + "받을 수 있습니다.";
+
         } else {
+
             recommendation =
-                    dashboardService
-                            .generateRecommendation(
-                                    achievementRate
-                            );
+                    "버튼을 눌러 오늘의 "
+                            + "AI 맞춤 학습 전략을 "
+                            + "받아보세요.";
         }
 
         /*

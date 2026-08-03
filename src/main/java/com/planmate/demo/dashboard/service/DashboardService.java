@@ -6,6 +6,7 @@ import com.planmate.demo.dashboard.repository.RecommendationRepository;
 import com.planmate.demo.dashboard.repository.StudyGoalRepository;
 import com.planmate.demo.entity.Subject;
 import com.planmate.demo.repository.SubjectRepository;
+import com.planmate.demo.service.GeminiService;
 import com.planmate.demo.study.model.StudyRecord;
 import com.planmate.demo.study.repository.StudyRecordRepository;
 import org.springframework.stereotype.Service;
@@ -23,17 +24,20 @@ public class DashboardService {
     private final RecommendationRepository recommendationRepository;
     private final StudyRecordRepository studyRecordRepository;
     private final SubjectRepository subjectRepository;
+    private final GeminiService geminiService;
 
     public DashboardService(
             StudyGoalRepository studyGoalRepository,
             RecommendationRepository recommendationRepository,
             StudyRecordRepository studyRecordRepository,
-            SubjectRepository subjectRepository
+            SubjectRepository subjectRepository,
+            GeminiService geminiService
     ) {
         this.studyGoalRepository = studyGoalRepository;
         this.recommendationRepository = recommendationRepository;
         this.studyRecordRepository = studyRecordRepository;
         this.subjectRepository = subjectRepository;
+        this.geminiService = geminiService;
     }
 
     /**
@@ -66,7 +70,10 @@ public class DashboardService {
 
         LocalDate today = LocalDate.now();
 
-        return ChronoUnit.DAYS.between(today, goalDate);
+        return ChronoUnit.DAYS.between(
+                today,
+                goalDate
+        );
     }
 
     /**
@@ -82,7 +89,9 @@ public class DashboardService {
         }
 
         double rate =
-                (double) achievedSeconds / targetSeconds * 100;
+                (double) achievedSeconds
+                        / targetSeconds
+                        * 100;
 
         return Math.round(rate * 10) / 10.0;
     }
@@ -99,11 +108,12 @@ public class DashboardService {
         LocalDate today = LocalDate.now();
 
         List<StudyRecord> records =
-                studyRecordRepository.findByUserIdAndStudyDateBetween(
-                        userId,
-                        today,
-                        today
-                );
+                studyRecordRepository
+                        .findByUserIdAndStudyDateBetween(
+                                userId,
+                                today,
+                                today
+                        );
 
         return records.stream()
                 .filter(record ->
@@ -132,20 +142,22 @@ public class DashboardService {
         LocalDate today = LocalDate.now();
 
         List<StudyRecord> records =
-                studyRecordRepository.findByUserIdAndStudyDateBetween(
-                        userId,
-                        today,
-                        today
-                );
+                studyRecordRepository
+                        .findByUserIdAndStudyDateBetween(
+                                userId,
+                                today,
+                                today
+                        );
 
-        int totalStudySeconds = records.stream()
-                .filter(record ->
-                        record.getDurationSeconds() != null
-                )
-                .mapToInt(
-                        StudyRecord::getDurationSeconds
-                )
-                .sum();
+        int totalStudySeconds =
+                records.stream()
+                        .filter(record ->
+                                record.getDurationSeconds() != null
+                        )
+                        .mapToInt(
+                                StudyRecord::getDurationSeconds
+                        )
+                        .sum();
 
         if (totalStudySeconds == 0) {
             return result;
@@ -156,20 +168,21 @@ public class DashboardService {
 
         for (Subject subject : subjects) {
 
-            int subjectStudySeconds = records.stream()
-                    .filter(record ->
-                            record.getDurationSeconds() != null
-                    )
-                    .filter(record ->
-                            record.getSubjectId()
-                                    .equals(
-                                            subject.getSubjectId()
-                                    )
-                    )
-                    .mapToInt(
-                            StudyRecord::getDurationSeconds
-                    )
-                    .sum();
+            int subjectStudySeconds =
+                    records.stream()
+                            .filter(record ->
+                                    record.getDurationSeconds() != null
+                            )
+                            .filter(record ->
+                                    record.getSubjectId()
+                                            .equals(
+                                                    subject.getSubjectId()
+                                            )
+                            )
+                            .mapToInt(
+                                    StudyRecord::getDurationSeconds
+                            )
+                            .sum();
 
             if (subjectStudySeconds == 0) {
                 continue;
@@ -197,29 +210,38 @@ public class DashboardService {
     }
 
     /**
-     * 목표 달성률에 따라 추천 문구를 생성한다.
+     * 목표 달성률에 따라
+     * 기본 추천 문구를 생성한다.
+     *
+     * Gemini 호출이 실패했을 때
+     * 대체 문구로도 사용할 수 있다.
      */
     public String generateRecommendation(
             double achievementRate
     ) {
 
         if (achievementRate < 30) {
+
             return "📖 오늘은 목표 공부량이 많이 부족합니다. "
                     + "1시간 이상 추가 학습을 추천합니다.";
 
         } else if (achievementRate < 60) {
+
             return "✍️ 조금만 더 공부하면 목표에 가까워집니다. "
                     + "30분 추가 학습을 추천합니다.";
 
         } else if (achievementRate < 80) {
+
             return "👍 좋은 학습 흐름입니다. "
                     + "현재 페이스를 유지하세요.";
 
         } else if (achievementRate < 100) {
+
             return "🎉 목표 달성이 얼마 남지 않았습니다. "
                     + "조금만 더 힘내세요!";
 
         } else {
+
             return "🏆 오늘의 목표를 모두 달성했습니다! "
                     + "정말 수고하셨습니다.";
         }

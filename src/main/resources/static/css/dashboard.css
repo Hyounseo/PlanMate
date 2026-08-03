@@ -421,6 +421,10 @@ body {
     color: #5d543e;
     font-size: 16px;
     line-height: 1.75;
+
+    white-space: pre-line;
+    line-height: 1.8;
+    word-break: keep-all;
 }
 
 /* =========================
@@ -845,4 +849,79 @@ body {
     color: #98a3b2;
     font-size: 14px;
     text-align: center;
+}
+
+/* =========================
+   AI Learning Coach
+========================= */
+
+.recommendation-content {
+    width: 100%;
+}
+
+.recommendation-text {
+    margin-top: 14px;
+    color: #374151;
+    font-size: 15px;
+    line-height: 1.8;
+    white-space: pre-line;
+    word-break: keep-all;
+}
+
+.ai-button-area {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 22px;
+}
+
+.ai-refresh-button {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(108, 99, 255, 0.25);
+    border-radius: 10px;
+    color: #655bd7;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+            transform 0.2s ease,
+            background 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.ai-refresh-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background: #ffffff;
+    box-shadow: 0 8px 20px rgba(77, 68, 180, 0.12);
+}
+
+.ai-refresh-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.ai-refresh-button.loading .ai-button-icon {
+    animation: ai-spin 1.2s linear infinite;
+}
+
+.ai-status-message {
+    min-height: 18px;
+    margin-top: 10px;
+    color: #8a849f;
+    font-size: 12px;
+}
+
+@keyframes ai-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }

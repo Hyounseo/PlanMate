@@ -3,11 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0">
 
     <title>PlanMate Dashboard</title>
 
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link
+            rel="stylesheet"
+            th:href="@{/css/dashboard.css}">
 </head>
 
 <body>
@@ -334,7 +338,6 @@
                             class="upcoming-item"
                             th:each="schedule : ${upcomingSchedules}">
 
-                        <!-- 일정 D-Day -->
                         <div
                                 class="d-day-box"
                                 th:text="${schedule.scheduleDate.isEqual(T(java.time.LocalDate).now())
@@ -469,28 +472,56 @@
 
                 </article>
 
-                <!-- 학습 추천 -->
+                <!-- AI Learning Coach -->
                 <article class="recommendation-card">
 
                     <div class="recommendation-icon">
                         ✨
                     </div>
 
-                    <div>
+                    <div class="recommendation-content">
+
                         <p class="section-label">
-                            AI RECOMMENDATION
+                            AI LEARNING COACH
                         </p>
 
                         <h2>
-                            오늘의 학습 추천
+                            오늘의 맞춤 학습 전략
                         </h2>
 
                         <p
-                                id="recommendation"
+                                id="aiRecommendation"
                                 class="recommendation-text"
                                 th:text="${recommendation}">
-                            추천 결과가 없습니다.
+                            AI 추천을 받아보세요.
                         </p>
+
+                        <div class="ai-button-area">
+
+                            <button
+                                    type="button"
+                                    id="refreshAiBtn"
+                                    class="ai-refresh-button"
+                                    th:disabled="${!hasGoal}">
+
+                                <span class="ai-button-icon">
+                                    ✨
+                                </span>
+
+                                <span id="aiButtonText">
+                                    AI 추천 새로 받기
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                        <p
+                                id="aiStatusMessage"
+                                class="ai-status-message"
+                                aria-live="polite">
+                        </p>
+
                     </div>
 
                 </article>
@@ -505,6 +536,82 @@
 
 <!-- 공통 Footer -->
 <div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- AI 추천 갱신 -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const refreshAiBtn =
+            document.getElementById("refreshAiBtn");
+
+        const aiRecommendation =
+            document.getElementById("aiRecommendation");
+
+        const aiButtonText =
+            document.getElementById("aiButtonText");
+
+        const aiStatusMessage =
+            document.getElementById("aiStatusMessage");
+
+        if (!refreshAiBtn) {
+            return;
+        }
+
+        refreshAiBtn.addEventListener("click", async () => {
+
+            refreshAiBtn.disabled = true;
+            refreshAiBtn.classList.add("loading");
+
+            aiButtonText.textContent =
+                "AI 추천 생성 중...";
+
+            aiStatusMessage.textContent =
+                "학습 데이터를 분석하고 있습니다.";
+
+            try {
+
+                const response = await fetch(
+                    "/api/ai/recommendation",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }
+                );
+
+                const text = await response.text();
+
+                if (!response.ok) {
+                    throw new Error(
+                        text || "AI 추천 요청에 실패했습니다."
+                    );
+                }
+
+                aiRecommendation.textContent = text;
+
+                aiStatusMessage.textContent =
+                    "새로운 추천이 생성되었습니다.";
+
+            } catch (error) {
+
+                console.error(error);
+
+                aiStatusMessage.textContent =
+                    error.message
+                    || "AI 추천을 불러오지 못했습니다.";
+
+            } finally {
+
+                refreshAiBtn.disabled = false;
+                refreshAiBtn.classList.remove("loading");
+
+                aiButtonText.textContent =
+                    "AI 추천 새로 받기";
+            }
+        });
+    });
+</script>
 
 <!-- 로그아웃 기능 -->
 <script th:replace="~{fragments/header :: logoutScript}"></script>
